@@ -12,8 +12,8 @@ import java.util.ArrayList;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor teamColor;
-    private ChessPiece.PieceType pieceType;
+    private final ChessGame.TeamColor teamColor;
+    private final ChessPiece.PieceType pieceType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.teamColor = pieceColor;
@@ -49,9 +49,24 @@ public class ChessPiece {
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         switch (pieceType) {
+            case KING:
+                KingMoveCalculator kingCalculator = new KingMoveCalculator(board, myPosition);
+                return kingCalculator.calculateMoves();
+            case QUEEN:
+                KingMoveCalculator kingCalculator2 = new KingMoveCalculator(board, myPosition);
+                return kingCalculator2.calculateMoves();
+            case BISHOP:
+                KingMoveCalculator kingCalculator3 = new KingMoveCalculator(board, myPosition);
+                return kingCalculator3.calculateMoves();
+            case KNIGHT:
+                KingMoveCalculator kingCalculator4 = new KingMoveCalculator(board, myPosition);
+                return kingCalculator4.calculateMoves();
             case ROOK:
                 RookMoveCalculator rookCalculator = new RookMoveCalculator(board, myPosition);
                 return rookCalculator.calculateMoves();
+            case PAWN:
+                KingMoveCalculator kingCalculator5 = new KingMoveCalculator(board, myPosition);
+                return kingCalculator5.calculateMoves();
         }
         return null;
     }

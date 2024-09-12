@@ -5,8 +5,8 @@ import java.util.Collection;
 
 public class RookMoveCalculator implements PieceMovesCalculator {
 
-    private static ChessPosition position;
-    private static ChessBoard board;
+    private final ChessPosition position;
+    private final ChessBoard board;
 
     RookMoveCalculator( ChessBoard board, ChessPosition position) {
         this.position = position;
@@ -14,20 +14,20 @@ public class RookMoveCalculator implements PieceMovesCalculator {
     }
 
 
-
     @Override
-    public Collection<ChessMove> calculateMoves(){
-        return new ArrayList<>();
-    }
+    public Collection<ChessMove> calculateMoves() {
+        Collection<ChessMove> moves = new ArrayList<>();
 
-    public Collection<ChessPosition> findDestinations() {
-        Collection<ChessPosition> destinations = new ArrayList<>();
+//        moves.add(returnValidMove(position, 1, 2, board));
+//        moves.add(returnValidMove(position, 2, 1, board));
+//        moves.add(returnValidMove(position, 2, -1, board));
+//        moves.add(returnValidMove(position, 1, -2, board));
+//        moves.add(returnValidMove(position, -1, -2, board));
+//        moves.add(returnValidMove(position, -2, -1, board));
+//        moves.add(returnValidMove(position, -2, 1, board));
+//        moves.add(returnValidMove(position, -1, 2, board));
 
-        ChessPosition currentPosition = position;
-        while(!isOutofBounds(currentPosition)) {
-            //currentPosition
-        }
-        return destinations;
+        return moves;
     }
 
 }
