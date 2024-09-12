@@ -7,14 +7,24 @@ public interface PieceMovesCalculator {
     public Collection<ChessMove> calculateMoves();
 
 
-    default boolean isTeammate(ChessGame.TeamColor pieceColor, ChessPosition position, ChessBoard board) {
-        ChessGame.TeamColor destinationColor = board.getPiece(position).getTeamColor();
+    default boolean isTeammate(ChessGame.TeamColor pieceColor, ChessPosition endPosition, ChessBoard board) {
+        ChessGame.TeamColor destinationColor = board.getPiece(endPosition).getTeamColor();
+        return pieceColor == destinationColor;
+    }
+
+    default boolean isTeammate(ChessGame.TeamColor pieceColor, int endRow, int endCol, ChessBoard board) {
+        ChessPosition endPosition = new ChessPosition(endRow, endCol);
+        ChessGame.TeamColor destinationColor = board.getPiece(endPosition).getTeamColor();
         return pieceColor == destinationColor;
     }
 
 
     default boolean inbounds(ChessPosition position) {
         return (position.getRow() >= 1) && (position.getRow() <= 8) && (position.getColumn() >= 1) && (position.getColumn() <= 8);
+    }
+
+    default boolean inbounds(int row, int column) {
+        return (row >= 1) && (row <= 8) && (column >= 1) && (column <= 8);
     }
 
     default ChessMove createMove(ChessPosition startPosition, ChessPosition endPosition) {
