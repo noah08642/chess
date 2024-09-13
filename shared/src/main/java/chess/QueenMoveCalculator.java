@@ -18,12 +18,15 @@ public class QueenMoveCalculator implements PieceMovesCalculator {
     public Collection<ChessMove> calculateMoves() {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        exploreHorizontalVertical(position, board, moves);
+        moveDirection(position, board, moves, 0,1);
+        moveDirection(position, board, moves, 0,-1);
+        moveDirection(position, board, moves, 1,0);
+        moveDirection(position, board, moves, -1,0);
 
-        moveDiagonal(position, board, moves, 1,1);
-        moveDiagonal(position, board, moves, -1,1);
-        moveDiagonal(position, board, moves, 1,-1);
-        moveDiagonal(position, board, moves, -1,-1);
+        moveDirection(position, board, moves, 1,1);
+        moveDirection(position, board, moves, -1,1);
+        moveDirection(position, board, moves, 1,-1);
+        moveDirection(position, board, moves, -1,-1);
 
 
         return moves;

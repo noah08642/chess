@@ -46,63 +46,10 @@ public interface PieceMovesCalculator {
         }
     }
 
-    default void exploreHorizontalVertical(ChessPosition position, ChessBoard board, Collection<ChessMove> moves) {
-        int row = position.getRow();
-        int column = position.getColumn();
-
-        // explore up
-        int increment = 1;
-        moveVertical(position, board, moves, row, column, increment);
-
-        // explore down
-        increment = -1;
-        moveVertical(position, board, moves, row, column, increment);
-
-        // explore right
-        increment = 1;
-        moveHorizontal(position, board, moves, row, column, increment);
-
-        // explore left
-        increment = -1;
-        moveHorizontal(position, board, moves, row, column, increment);
 
 
-    }
 
-    private void moveVertical(ChessPosition position, ChessBoard board, Collection<ChessMove> moves, int row, int column, int increment) {
-        int direction = increment;
-        while (inbounds(row + increment, column)) {
-            if (vacant(row + increment, column, board)) {
-                addIfValidMove(position, increment, 0, board, moves);
-                increment += direction;
-            }
-            else {
-                if (!isTeammate(board.getPiece(position).getTeamColor(), row + increment, column, board)) {
-                    addIfValidMove(position, increment, 0, board, moves);
-                }
-                break;
-            }
-        }
-    }
-
-    private void moveHorizontal(ChessPosition position, ChessBoard board, Collection<ChessMove> moves, int row, int column, int increment) {
-        int direction = increment;
-        while (inbounds(row, column + increment)) {
-            if (vacant(row, column + increment, board)) {
-                addIfValidMove(position, 0, increment, board, moves);
-                increment += direction;
-            }
-            else {
-                if (!isTeammate(board.getPiece(position).getTeamColor(), row, column + increment, board)) {
-                    addIfValidMove(position, 0, increment, board, moves);
-                }
-                break;
-            }
-        }
-    }
-
-
-    default void moveDiagonal(ChessPosition position, ChessBoard board, Collection<ChessMove> moves, int incrementVert, int incrementHor) {
+    default void moveDirection(ChessPosition position, ChessBoard board, Collection<ChessMove> moves, int incrementVert, int incrementHor) {
         int row = position.getRow();
         int column = position.getColumn();
         int vertDirection = incrementVert;
