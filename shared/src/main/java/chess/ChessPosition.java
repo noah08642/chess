@@ -49,9 +49,10 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "ChessPosition{" +
-                "row=" + row +
-                ", column=" + column +
-                '}';
+        char[] letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
+        char letter = letters[column - 1];
+
+        return letter + String.valueOf(row);
     }
 }

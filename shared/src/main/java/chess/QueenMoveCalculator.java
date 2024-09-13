@@ -3,12 +3,12 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMoveCalculator implements PieceMovesCalculator {
+public class QueenMoveCalculator implements PieceMovesCalculator {
 
     private final ChessPosition position;
     private final ChessBoard board;
 
-    RookMoveCalculator( ChessBoard board, ChessPosition position) {
+    QueenMoveCalculator(ChessBoard board, ChessPosition position) {
         this.position = position;
         this.board = board;
     }
@@ -19,6 +19,12 @@ public class RookMoveCalculator implements PieceMovesCalculator {
         Collection<ChessMove> moves = new ArrayList<>();
 
         exploreHorizontalVertical(position, board, moves);
+
+        moveDiagonal(position, board, moves, 1,1);
+        moveDiagonal(position, board, moves, -1,1);
+        moveDiagonal(position, board, moves, 1,-1);
+        moveDiagonal(position, board, moves, -1,-1);
+
 
         return moves;
     }

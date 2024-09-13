@@ -20,6 +20,7 @@ public class RookMoveTests {
                         | | |R| | | | | |
                         | | | | | | | | |
                         """,
+
                 new ChessPosition(2, 3),
                 new int[][]{
                         {2, 4}, {2, 5}, {2, 6}, {2, 7}, {2, 8},
