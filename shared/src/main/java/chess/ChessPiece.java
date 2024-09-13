@@ -65,8 +65,8 @@ public class ChessPiece {
                 RookMoveCalculator rookCalculator = new RookMoveCalculator(board, myPosition);
                 return rookCalculator.calculateMoves();
             case PAWN:
-                KingMoveCalculator kingCalculator5 = new KingMoveCalculator(board, myPosition);
-                return kingCalculator5.calculateMoves();
+                PawnMoveCalculator pawnCalculator = new PawnMoveCalculator(board, myPosition);
+                return pawnCalculator.calculateMoves();
         }
         return null;
     }

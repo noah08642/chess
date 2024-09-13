@@ -17,6 +17,17 @@ public interface PieceMovesCalculator {
         return pieceColor == destinationColor;
     }
 
+    default boolean isEnemy(ChessPosition startPosition, ChessPosition endPosition, ChessBoard board) {
+        if (board.getPiece(endPosition) == null) {
+            return false;
+        }
+        ChessGame.TeamColor startColor = board.getPiece(startPosition).getTeamColor();
+        ChessGame.TeamColor destinationColor = board.getPiece(endPosition).getTeamColor();
+
+        return startColor != destinationColor;
+
+    }
+
     default boolean isTeammate(ChessGame.TeamColor pieceColor, int endRow, int endCol, ChessBoard board) {
         ChessPosition endPosition = new ChessPosition(endRow, endCol);
         ChessGame.TeamColor destinationColor = board.getPiece(endPosition).getTeamColor();
@@ -41,7 +52,7 @@ public interface PieceMovesCalculator {
         if (inbounds(newPosition)){
             ChessPiece piece = board.getPiece(newPosition);
             if (piece == null || !isTeammate(board.getPiece(startPosition).getTeamColor(), newPosition, board)) {
-                moves.add(createMove(startPosition, newPosition));
+//                moves.add(createMove(startPosition, newPosition));
             }
         }
     }
