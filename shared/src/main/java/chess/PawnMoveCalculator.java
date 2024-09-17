@@ -24,6 +24,9 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
                 normalPawnMove(moves, color);
                 doubleMove(moves, color);
             }
+            else if (position.getRow() == 7) {
+                promotionPawnMove(moves, color);
+            }
             else {
                 normalPawnMove(moves, color);
             }
@@ -31,16 +34,16 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
 
         else if (color == ChessGame.TeamColor.BLACK) {
             if (position.getRow() == 7) {
-                if (position.getRow() == 2) {
                     normalPawnMove(moves, color);
                     doubleMove(moves, color);
-                }
-                else {
-                    normalPawnMove(moves, color);
-                }
+            }
+            else if (position.getRow() == 2) {
+                promotionPawnMove(moves, color);
+            }
+            else {
+                normalPawnMove(moves, color);
             }
         }
-
         return moves;
     }
 
@@ -53,20 +56,17 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
         int column = position.getColumn();
         ChessPosition newPosition = new ChessPosition(row + direction, column);
         if (vacant(row + direction, column, board)) {
-            ChessMove newMove = new ChessMove(position, newPosition, null);
             moves.add(createMove(position, newPosition));
             }
         ChessPosition newPosition2 = new ChessPosition(row + direction, column + 1);
         if (inbounds(newPosition2)) {
             if (isEnemy(position, newPosition2, board)) {
-                ChessMove newMove = new ChessMove(position, newPosition2, null);
                 moves.add(createMove(position, newPosition2));
             }
         }
         ChessPosition newPosition3 = new ChessPosition(row + direction, column - 1);
         if (inbounds(newPosition3)) {
             if (isEnemy(position, newPosition3, board)) {
-                ChessMove newMove = new ChessMove(position, newPosition3, null);
                 moves.add(createMove(position, newPosition3));
             }
         }
@@ -81,9 +81,46 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
 
         int row = position.getRow();
         int column = position.getColumn();
-        if (vacant(row + direction, column, board)) {
-            ChessMove newMove = new ChessMove(position, new ChessPosition(row + 2, column), null);
+        if (vacant(row + direction, column, board) && vacant(row + (direction/2), column, board)) {
+            ChessMove newMove = new ChessMove(position, new ChessPosition(row + direction, column), null);
+            moves.add(newMove);
         }
+    }
+
+    public void promotionPawnMove(Collection<ChessMove> moves, ChessGame.TeamColor color) {
+        int direction = 1;
+        if (color == ChessGame.TeamColor.BLACK) {
+            direction = -1;
+        }
+        int row = position.getRow();
+        int column = position.getColumn();
+        ChessPosition newPosition = new ChessPosition(row + direction, column);
+        if (vacant(row + direction, column, board)) {
+            addPromotionMove(moves, position, newPosition);
+        }
+        ChessPosition newPosition2 = new ChessPosition(row + direction, column + 1);
+        if (inbounds(newPosition2)) {
+            if (isEnemy(position, newPosition2, board)) {
+                addPromotionMove(moves, position, newPosition2);
+            }
+        }
+        ChessPosition newPosition3 = new ChessPosition(row + direction, column - 1);
+        if (inbounds(newPosition3)) {
+            if (isEnemy(position, newPosition3, board)) {
+                addPromotionMove(moves, position, newPosition3);
+            }
+        }
+    }
+
+    public void addPromotionMove(Collection<ChessMove> moves, ChessPosition start, ChessPosition end) {
+        ChessMove newMove = new ChessMove(start, end, ChessPiece.PieceType.BISHOP);
+        ChessMove newMove1 = new ChessMove(start, end, ChessPiece.PieceType.KNIGHT);
+        ChessMove newMove2 = new ChessMove(start, end, ChessPiece.PieceType.ROOK);
+        ChessMove newMove3 = new ChessMove(start, end, ChessPiece.PieceType.QUEEN);
+        moves.add(newMove);
+        moves.add(newMove1);
+        moves.add(newMove2);
+        moves.add(newMove3);
     }
 
 }

@@ -32,10 +32,12 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return startPosition +
-                " --> " + endPosition;
-               // ", promotionPiece=" + promotionPiece +
-              //  '}';
+        if (promotionPiece == null) {
+            return startPosition + " -> " + endPosition;
+        }
+        else {
+            return startPosition + " -> " + endPosition + " (" + promotionPiece + ")";
+        }
     }
 
     @Override

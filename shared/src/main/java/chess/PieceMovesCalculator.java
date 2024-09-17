@@ -52,7 +52,7 @@ public interface PieceMovesCalculator {
         if (inbounds(newPosition)){
             ChessPiece piece = board.getPiece(newPosition);
             if (piece == null || !isTeammate(board.getPiece(startPosition).getTeamColor(), newPosition, board)) {
-//                moves.add(createMove(startPosition, newPosition));
+                moves.add(createMove(startPosition, newPosition));
             }
         }
     }
