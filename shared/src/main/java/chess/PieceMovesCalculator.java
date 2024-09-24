@@ -23,7 +23,6 @@ public interface PieceMovesCalculator {
         }
         ChessGame.TeamColor startColor = board.getPiece(startPosition).getTeamColor();
         ChessGame.TeamColor destinationColor = board.getPiece(endPosition).getTeamColor();
-
         return startColor != destinationColor;
 
     }

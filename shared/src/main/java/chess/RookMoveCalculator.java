@@ -23,6 +23,8 @@ public class RookMoveCalculator implements PieceMovesCalculator {
         moveDirection(position, board, moves, 1,0);
         moveDirection(position, board, moves, -1,0);
 
+
+
         return moves;
     }
 }

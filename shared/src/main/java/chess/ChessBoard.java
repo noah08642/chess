@@ -13,7 +13,17 @@ public class ChessBoard {
 
     private ChessPiece[][] squares = new ChessPiece[8][8];
 
-    public ChessBoard() {}
+    public ChessBoard() {
+        resetBoard();
+    }
+
+    public ChessPiece[][] getBoard() {
+        return squares;
+    }
+
+    public boolean Vacant(int i, int j) {
+        return squares[i][j] == null;
+    }
 
     /**
      * Adds a chess piece to the chessboard
