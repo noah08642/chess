@@ -9,13 +9,11 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable {
 
     private ChessPiece[][] squares = new ChessPiece[8][8];
 
-    public ChessBoard() {
-        resetBoard();
-    }
+    public ChessBoard() {}
 
     public ChessPiece[][] getBoard() {
         return squares;
@@ -101,6 +99,25 @@ public class ChessBoard {
     }
 
     @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            ChessPiece[][] newSquares = new ChessPiece[8][8];
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    newSquares[i][j] = squares[i][j];
+                }
+            }
+            clone.squares = newSquares;
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -115,8 +132,25 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "squares=" + Arrays.toString(squares) +
-                '}';
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                if (squares[i][j] == null) {
+                    sb.append(" ");
+                }
+                else {
+                    sb.append(squares[i][j]);
+                }
+                if (j < squares[i].length - 1) {
+                    sb.append(" "); // Add space between elements in the row
+                }
+            }
+            if (i < squares[i].length + 1) {
+                sb.append("\n");
+            }
+        }
+
+        return sb.toString();
     }
 }
