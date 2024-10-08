@@ -14,6 +14,8 @@ public class BishopMoveCalculator implements PieceMovesCalculator {
     }
 
 
+    // thing
+
     @Override
     public Collection<ChessMove> calculateMoves() {
         Collection<ChessMove> moves = new ArrayList<>();
