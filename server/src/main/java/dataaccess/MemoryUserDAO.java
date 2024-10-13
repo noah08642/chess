@@ -34,15 +34,11 @@ public class MemoryUserDAO implements UserDAO {
         }
     }
 
-//For the most part, the methods on your DAO classes will be CRUD operations that:
+    public void clear() {
+        userDatabase.clear();
+    }
 
-//Create objects in the data store
-//Read objects from the data store
-//Update objects already in the data store
-//Delete objects from the data store
-//Oftentimes, the parameters and return values of your DAO methods will be the model objects described in the previous section (UserData, GameData, and AuthData). For example, your DAO classes will certainly need to provide a method for creating new UserData objects in the data store. This method might have a signature that looks like this:
-
-//void insertUser(UserData u) throws DataAccessException
+    // didn't create an update method... Not sure what that will look like...
 
 
 }
