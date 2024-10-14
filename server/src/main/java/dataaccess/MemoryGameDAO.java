@@ -29,6 +29,13 @@ public class MemoryGameDAO implements GameDAO {
         return gameDatabase.containsKey(id);
     }
 
+    public boolean gameExists(int gameID) {
+        IntegerID id = new IntegerID(gameID);
+        return gameDatabase.containsKey(id);
+    }
+
+
+
     public Map<IntegerID, GameData> listGames() {
         // not sure how I'm supposed to return this... as a list?
         return gameDatabase;

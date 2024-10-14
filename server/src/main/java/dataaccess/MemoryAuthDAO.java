@@ -17,11 +17,15 @@ public class MemoryAuthDAO implements AuthDAO {
         authDatabase.put(a.authToken(), a);
     }
 
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken)throws DataAccessException {
         return authDatabase.get(authToken);
     }
 
-    public void deleteAuth(String authToken) {
+    public void deleteAuth(String authToken) throws DataAccessException{
+        AuthData a = authDatabase.get(authToken);
+        if(a==null) {
+            throw new DataAccessException("AuthToken not in database");
+        }
         authDatabase.remove(authToken);
     }
 

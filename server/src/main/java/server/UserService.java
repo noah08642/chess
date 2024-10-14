@@ -1,25 +1,67 @@
 package server;
 
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
-import request.RegisterRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import result.LoginResult;
+import request.LoginRequest;
+import request.LogoutRequest;
+import request.RegisterRequest;
+import result.LogRegResult;
+
 
 public class UserService {
+    MemoryUserDAO udb;
+    MemoryAuthDAO adb;
 
-    public LoginResult register(RegisterRequest register) {
-        String user = register.username();
-        String pass = register.password();
-        String mail = register.email();
-
-        UserDAO userDAO = new MemoryUserDAO();
-
-
+    UserService(MemoryUserDAO udb, MemoryAuthDAO adb) {
+        this.udb = udb;
+        this.adb = adb;
     }
+
+
+    public LogRegResult register(RegisterRequest request) throws DataAccessException {
+        String user = request.username();
+        String pass = request.password();
+        String mail = request.email();
+
+
+        if (udb.getUser(user) != null) {
+            throw new DataAccessException("Username Already Taken");
+        }
+
+        UserData userData = new UserData(user, pass, mail);
+        udb.insertUser(userData);
+
+        String authToken = returnAuth();
+        AuthData authData = new AuthData(authToken, user);
+        adb.insertAuth(authData);
+        return new LogRegResult(user, authToken);
+    }
+
+    public LogRegResult login(LoginRequest request) throws DataAccessException {
+        String user = request.username();
+        String pass = request.password();
+
+        UserData userData = udb.getUser(user);
+        if(!userData.password().equals(pass)) {
+            throw new DataAccessException("Wrong Password");
+        }
+
+        String authToken = returnAuth();
+        AuthData authData = new AuthData(authToken, user);
+        adb.insertAuth(authData);
+        return new LogRegResult(user, authToken);
+    }
+
+    public void logout(LogoutRequest request) throws DataAccessException{
+        adb.deleteAuth(request.authToken());
+    }
+
+    public String returnAuth() {
+        AuthGenerator a = new AuthGenerator();
+        return a.generate();
+    }
+
 
 
 
