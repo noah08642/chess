@@ -3,8 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.List;
+
 
 
 public interface GameDAO {
@@ -12,7 +12,7 @@ public interface GameDAO {
     void insertGame(GameData g) throws DataAccessException;
     GameData getGame(int gameID);
     boolean gameExists(GameData u);
-    Map<IntegerID, GameData> listGames();
+    List<GameData> listGames();
     void deleteGame(GameData u) throws DataAccessException;
     void clear();
     void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user);

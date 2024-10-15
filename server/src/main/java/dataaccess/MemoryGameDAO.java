@@ -3,43 +3,40 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
 
 
-    private Map<IntegerID, GameData> gameDatabase;
+    private Map<Integer, GameData> gameDatabase;
 
     public MemoryGameDAO() {
         gameDatabase = new HashMap<>();
     }
 
     public void insertGame(GameData g) throws DataAccessException {
-        IntegerID id = new IntegerID(g.gameID());
-        gameDatabase.put(id, g);
+        gameDatabase.put(g.gameID(), g);
     }
 
     public GameData getGame(int gameID) {
-        IntegerID id = new IntegerID(gameID);
-        return gameDatabase.get(id);
+        return gameDatabase.get(gameID);
     }
 
     public boolean gameExists(GameData g) {
-        IntegerID id = new IntegerID(g.gameID());
-        return gameDatabase.containsKey(id);
+        return gameDatabase.containsKey(g.gameID());
     }
 
     public boolean gameExists(int gameID) {
-        IntegerID id = new IntegerID(gameID);
-        return gameDatabase.containsKey(id);
+        return gameDatabase.containsKey(gameID);
     }
 
 
 
-    public Map<IntegerID, GameData> listGames() {
-        // not sure how I'm supposed to return this... as a list?
-        return gameDatabase;
+    public List<GameData> listGames() {
+        return new ArrayList<>(gameDatabase.values());
     }
 
     public void updateGame(int gameID, String newName) {
@@ -53,14 +50,12 @@ public class MemoryGameDAO implements GameDAO {
             throw new DataAccessException("user doesn't exist");
         }
         else {
-            IntegerID id = new IntegerID(g.gameID());
-            gameDatabase.remove(id);
+            gameDatabase.remove(g.gameID());
         }
     }
 
     public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) {
-        IntegerID id = new IntegerID(gameID);
-        GameData g = gameDatabase.get(id);
+        GameData g = gameDatabase.get(gameID);
         g.addUser(playerColor, user);
     }
 

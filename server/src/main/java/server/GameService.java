@@ -56,9 +56,9 @@ public class GameService {
 
     public ListResult list(ListRequest request) throws DataAccessException {
         String auth = request.authToken();
-
         AuthData a = adb.getAuth(auth);
-        gdb.listGames();
+
+        return new ListResult(gdb.listGames());
         // not sure how games should be passed... as a list or map?
     }
 
