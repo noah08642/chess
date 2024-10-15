@@ -1,6 +1,7 @@
 # Chess
 
 This project demonstrates mastery of proper software design, client/server architecture, networking using HTTP and WebSocket, database persistence, unit testing, serialization, and security.
+It is executed in Intellij
 
 ## 10k Architecture Overview
 
