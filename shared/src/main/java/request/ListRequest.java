@@ -1,4 +1,6 @@
 package request;
 
-public record ListRequest() {
+import model.AuthData;
+
+public record ListRequest(String authToken) {
 }

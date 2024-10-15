@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.HashMap;
@@ -55,6 +56,12 @@ public class MemoryGameDAO implements GameDAO {
             IntegerID id = new IntegerID(g.gameID());
             gameDatabase.remove(id);
         }
+    }
+
+    public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) {
+        IntegerID id = new IntegerID(gameID);
+        GameData g = gameDatabase.get(id);
+        g.addUser(playerColor, user);
     }
 
     public void clear() {

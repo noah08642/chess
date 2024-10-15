@@ -15,5 +15,6 @@ public interface GameDAO {
     Map<IntegerID, GameData> listGames();
     void deleteGame(GameData u) throws DataAccessException;
     void clear();
+    void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user);
 }
 //(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game)

@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public final class GameData {
     private final int gameID;
-    private final String whiteUsername;
-    private final String blackUsername;
+    private  String whiteUsername;
+    private  String blackUsername;
     private String gameName;
     private final ChessGame game;
 
@@ -32,6 +32,16 @@ public final class GameData {
 
     public String blackUsername() {
         return blackUsername;
+    }
+
+    public void addUser(ChessGame.TeamColor color, String user) {
+        if (color== ChessGame.TeamColor.BLACK) {
+            blackUsername = user;
+        }
+        else {
+            whiteUsername = user;
+        }
+
     }
 
     public String gameName() {
