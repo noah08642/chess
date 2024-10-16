@@ -13,7 +13,7 @@ public class UserService {
     MemoryUserDAO udb;
     MemoryAuthDAO adb;
 
-    UserService(MemoryUserDAO udb, MemoryAuthDAO adb) {
+    public UserService(MemoryUserDAO udb, MemoryAuthDAO adb) {
         this.udb = udb;
         this.adb = adb;
     }
@@ -25,9 +25,9 @@ public class UserService {
         String mail = request.email();
 
 
-        if (udb.getUser(user) != null) {
-            throw new DataAccessException("Username Already Taken");
-        }
+//        if (udb.getUser(user) != null) {
+//            throw new DataAccessException("Username Already Taken");
+//        }
 
         UserData userData = new UserData(user, pass, mail);
         udb.insertUser(userData);

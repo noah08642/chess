@@ -9,7 +9,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     private Map<String, AuthData> authDatabase;
 
-    MemoryAuthDAO() {
+    public MemoryAuthDAO() {
         authDatabase = new HashMap<>();
     }
 
