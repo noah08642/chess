@@ -32,7 +32,7 @@ public class GameService {
         String authToken = request.authToken();
 
         // authenticate, generate id, add to database
-        AuthData a = adb.getAuth(authToken);
+        adb.throwExIfInvalid(authToken);
         int id = generateID();
         GameData g = new GameData(id, "", "", gameName, new ChessGame());
         gdb.insertGame(g);
@@ -55,12 +55,12 @@ public class GameService {
         // throw error if color is already taken
         if (color == ChessGame.TeamColor.WHITE) {
             if (!Objects.equals(g.whiteUsername(), "")) {
-                throw new DataAccessException("Color already taken");
+                throw new BadRequestException();
             }
         }
         else {
             if (!Objects.equals(g.blackUsername(), "")) {
-                throw new DataAccessException("Color already taken");
+                throw new BadRequestException();
             }
         }
 

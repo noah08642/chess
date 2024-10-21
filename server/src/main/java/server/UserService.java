@@ -24,11 +24,6 @@ public class UserService {
         String pass = request.password();
         String mail = request.email();
 
-
-//        if (udb.getUser(user) != null) {
-//            throw new DataAccessException("Username Already Taken");
-//        }
-
         UserData userData = new UserData(user, pass, mail);
         udb.insertUser(userData);
 

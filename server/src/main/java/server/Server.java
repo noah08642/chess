@@ -3,8 +3,11 @@ import dataaccess.*;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
+import request.ListRequest;
+import result.ErrorResult;
+import result.ListResult;
 import spark.*;
-
+import com.google.gson.Gson;
 
 public class Server {
 
@@ -37,22 +40,22 @@ public class Server {
         // Global exception handling
         Spark.exception(BadRequestException.class, (exception, req, res) -> {
             res.status(400);
-            res.body("Message: " + exception.getMessage());
+            res.body(returnSerializedError(exception.getMessage()));
         });
 
         Spark.exception(AlreadyTakenException.class, (exception, req, res) -> {
             res.status(403);
-            res.body("Message: " + exception.getMessage());
+            res.body(returnSerializedError(exception.getMessage()));
         });
 
         Spark.exception(InvalidAuthException.class, (exception, req, res) -> {
             res.status(401);
-            res.body("Message: " + exception.getMessage());
+            res.body(returnSerializedError(exception.getMessage()));
         });
 
         Spark.exception(DataAccessException.class, (exception, req, res) -> {
             res.status(500);
-            res.body("Message: " + exception.getMessage());
+            res.body(returnSerializedError(exception.getMessage()));
         });
 
 
@@ -87,7 +90,7 @@ public class Server {
         UserHandler userHandler = new UserHandler(req, udb, adb);
         userHandler.handleLogout();
         res.status(200);
-        return res.body();
+        return "";
     }
 
 
@@ -117,6 +120,12 @@ public class Server {
         ClearHandler clearHandler = new ClearHandler(udb, adb, gdb);
         res.status(200);
         return "";
+    }
+
+    public String returnSerializedError(String message) {
+        ErrorResult result = new ErrorResult(message);
+        var serializer = new Gson();
+        return serializer.toJson(result);
     }
 
 

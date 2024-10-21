@@ -36,9 +36,8 @@ public class UserHandler {
     }
 
     public void handleLogout() throws DataAccessException {
-        var serializer = new Gson();
-        System.out.println(req.headers().toString());
-        var logoutObject = serializer.fromJson(req.headers().toString(), LogoutRequest.class);
-        userService.logout(logoutObject);
+        String authToken = req.headers("Authorization");
+        LogoutRequest request = new LogoutRequest(authToken);
+        userService.logout(request);
     }
 }

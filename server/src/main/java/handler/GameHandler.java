@@ -21,16 +21,18 @@ public class GameHandler {
     }
 
     public String handleList() throws DataAccessException {
-        var serializer = new Gson();
-        var listRequest = serializer.fromJson(req.body(), ListRequest.class);
-        ListResult result = gameService.list(listRequest);
+        ListRequest request = new ListRequest(req.headers("Authorization"));
+        ListResult result = gameService.list(request);
 
+        var serializer = new Gson();
         return serializer.toJson(result);
     }
 
     public String handleCreate() throws DataAccessException {
+        String authToken = req.headers("Authorization");
         var serializer = new Gson();
-        var createRequest = serializer.fromJson(req.body(), CreateGameRequest.class);
+        var partialRequest = serializer.fromJson(req.body(), CreateGameRequest.class);
+        CreateGameRequest createRequest = new CreateGameRequest(partialRequest.gameName(), authToken);
         CreateJoinResult result = gameService.create(createRequest);
 
         return serializer.toJson(result);
@@ -39,6 +41,7 @@ public class GameHandler {
     public String handleJoin() throws DataAccessException {
         var serializer = new Gson();
         var joinRequest = serializer.fromJson(req.body(), JoinGameRequest.class);
+        joinRequest.addAuth(req.headers("Authorization"));
         CreateJoinResult result = gameService.join(joinRequest);
 
         return serializer.toJson(result);

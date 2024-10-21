@@ -39,7 +39,9 @@ public class GameServiceTest {
         CreateGameRequest request = new CreateGameRequest("game1", authToken);
         CreateJoinResult result = gameService.create(request);
 
-        assertNotNull(result);
+        assertNotNull(result, "Result should not be null");
+
+        assertTrue(result.gameID() > 0, "Game ID should be greater than 0");
     }
 
 
@@ -49,7 +51,7 @@ public class GameServiceTest {
 
         // register with invalid authToken
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.create(request));
-        assertEquals("Not a valid authToken", exception.getMessage());
+        assertEquals("Error: unauthorized", exception.getMessage());
     }
 
     @Test
@@ -96,7 +98,7 @@ public class GameServiceTest {
         // request with invalid authToken
         ListRequest listRequest= new ListRequest("BadToken");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.list(listRequest));
-        assertEquals("Not a valid authToken", exception.getMessage());
+        assertEquals("Error: unauthorized", exception.getMessage());
     }
 
 
