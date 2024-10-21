@@ -18,14 +18,12 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuth(String authToken)throws DataAccessException {
+        throwExIfInvalid(authToken);
         return authDatabase.get(authToken);
     }
 
     public void deleteAuth(String authToken) throws DataAccessException{
-        AuthData a = authDatabase.get(authToken);
-        if(a==null) {
-            throw new DataAccessException("AuthToken not in database");
-        }
+        throwExIfInvalid(authToken);
         authDatabase.remove(authToken);
     }
 
@@ -33,10 +31,9 @@ public class MemoryAuthDAO implements AuthDAO {
         authDatabase.clear();
     }
 
-
-
-
-    //createAuth: Create a new authorization.
-    //        getAuth: Retrieve an authorization given an authToken.
-   // deleteAuth: Delete an authorization so that it is no longer valid.
+    public void throwExIfInvalid(String authToken) throws DataAccessException {
+        if (!authDatabase.containsKey(authToken)) {
+            throw new DataAccessException("Not a valid authToken");
+        }
+    }
 }

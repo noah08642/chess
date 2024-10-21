@@ -11,6 +11,8 @@ import request.ListRequest;
 import result.CreateJoinResult;
 import result.ListResult;
 
+import java.util.Objects;
+
 public class GameService {
 
     private MemoryGameDAO gdb;
@@ -49,6 +51,19 @@ public class GameService {
         UserData u = udb.getUser(user);
 
         GameData g = gdb.getGame(id);
+
+        // throw error if color is already taken
+        if (color == ChessGame.TeamColor.WHITE) {
+            if (!Objects.equals(g.whiteUsername(), "")) {
+                throw new DataAccessException("Color already taken");
+            }
+        }
+        else {
+            if (!Objects.equals(g.blackUsername(), "")) {
+                throw new DataAccessException("Color already taken");
+            }
+        }
+
         gdb.addPlayer(color, id, user);
 
         return new CreateJoinResult(id);
@@ -56,10 +71,9 @@ public class GameService {
 
     public ListResult list(ListRequest request) throws DataAccessException {
         String auth = request.authToken();
-        AuthData a = adb.getAuth(auth);
+        adb.throwExIfInvalid(auth);
 
         return new ListResult(gdb.listGames());
-        // not sure how games should be passed... as a list or map?
     }
 
     public int generateID() {

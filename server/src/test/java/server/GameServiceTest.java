@@ -7,11 +7,9 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import request.CreateGameRequest;
-import request.JoinGameRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import request.*;
 import result.CreateJoinResult;
+import result.ListResult;
 import result.LogRegResult;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,39 +45,77 @@ public class GameServiceTest {
 
     @Test
     public void createNegative() throws DataAccessException {
-        CreateGameRequest request = new CreateGameRequest("game1", authToken);
-        CreateJoinResult result = gameService.create(request);
+        CreateGameRequest request = new CreateGameRequest("game1", "BadAuthToken");
 
-        // register again with same name
+        // register with invalid authToken
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.create(request));
-        assertEquals("Game name taken", exception.getMessage());
+        assertEquals("Not a valid authToken", exception.getMessage());
     }
 
     @Test
     public void joinPositive() throws DataAccessException {
         CreateGameRequest createRequest = new CreateGameRequest("game1", authToken);
-        CreateJoinResult result = gameService.create(createRequest);
+        CreateJoinResult createResult = gameService.create(createRequest);
 
         // join game
-        JoinGameRequest request = new JoinGameRequest(ChessGame.TeamColor.WHITE, )
-
-
+        JoinGameRequest request = new JoinGameRequest(ChessGame.TeamColor.WHITE, createResult.gameID(), authToken);
+        CreateJoinResult joinResult = gameService.join(request);
+        assertEquals(joinResult.gameID(), request.gameID());
     }
 
     @Test
-    public void loginNegative() throws DataAccessException {
-        // register a new user
-        RegisterRequest regRequest = new RegisterRequest("noah", "poop", "noah@gmail.com");
-        userService.register(regRequest);
+    public void joinNegative() throws DataAccessException {
+        CreateGameRequest createRequest = new CreateGameRequest("game1", authToken);
+        CreateJoinResult createResult = gameService.create(createRequest);
 
-        // test login with incorrect password
-        LoginRequest request = new LoginRequest("noah", "poopy");
-        DataAccessException exception = assertThrows(DataAccessException.class, () -> userService.login(request));
-        assertEquals("Incorrect username or password", exception.getMessage());
+        // join game
+        JoinGameRequest request = new JoinGameRequest(ChessGame.TeamColor.WHITE, createResult.gameID(), authToken);
+        CreateJoinResult joinResult = gameService.join(request);
 
-        // test login with incorrect user
-        LoginRequest request2 = new LoginRequest("noahGoo", "poop");
-        DataAccessException exception2 = assertThrows(DataAccessException.class, () -> userService.login(request2));
-        assertEquals("Incorrect username or password", exception.getMessage());
+        // join game with same color
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.join(request));
+        assertEquals("Color already taken", exception.getMessage());
     }
+
+    @Test
+    public void listPositive() throws DataAccessException {
+        // Create a game
+        CreateGameRequest request = new CreateGameRequest("game1", authToken);
+        gameService.create(request);
+
+        ListRequest listRequest= new ListRequest(authToken);
+        ListResult listResult = gameService.list(listRequest);
+        assertEquals(listResult.games().getFirst().gameName(), "game1");
+    }
+    @Test
+    public void listNegative() throws DataAccessException {
+        // Create a game
+        CreateGameRequest request = new CreateGameRequest("game1", authToken);
+        gameService.create(request);
+
+        // request with invalid authToken
+        ListRequest listRequest= new ListRequest("BadToken");
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.list(listRequest));
+        assertEquals("Not a valid authToken", exception.getMessage());
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
