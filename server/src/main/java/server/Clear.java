@@ -10,7 +10,7 @@ public class Clear {
     private MemoryAuthDAO adb;
     private MemoryUserDAO udb;
 
-    Clear(MemoryGameDAO gdb, MemoryAuthDAO adb, MemoryUserDAO udb) {
+    public Clear(MemoryGameDAO gdb, MemoryAuthDAO adb, MemoryUserDAO udb) {
         this.adb = adb;
         this.gdb = gdb;
         this.udb = udb;

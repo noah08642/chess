@@ -57,7 +57,7 @@ public class MemoryGameDAO implements GameDAO {
 
     public void throwExIfInvalid(int gameID) throws DataAccessException {
         if (!gameDatabase.containsKey(gameID)) {
-            throw new DataAccessException("Invalid game ID");
+            throw new BadRequestException();
         }
     }
     

@@ -33,7 +33,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     public void throwExIfInvalid(String authToken) throws DataAccessException {
         if (!authDatabase.containsKey(authToken)) {
-            throw new DataAccessException("Not a valid authToken");
+            throw new InvalidAuthException();
         }
     }
 }

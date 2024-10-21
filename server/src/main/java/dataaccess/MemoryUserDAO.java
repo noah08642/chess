@@ -15,16 +15,13 @@ public class MemoryUserDAO implements UserDAO {
 
     public void insertUser(UserData u) throws DataAccessException {
         if (userExists(u)) {
-            throw new DataAccessException("Username taken");
+            throw new AlreadyTakenException();
         }
         userDatabase.put(u.username(), u);
     }
 
     public UserData getUser(String username) throws DataAccessException {
-        UserData u = userDatabase.get(username);
-        if (u==null) {
-            throw new DataAccessException("user is not in database");
-        }
+        throwExIfInvalid(username);
         return userDatabase.get(username);
     }
 
@@ -33,19 +30,17 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void deleteUser(UserData u) throws DataAccessException {
-        if(!userExists(u)) {
-            throw new DataAccessException("user doesn't exist");
-        }
-        else {
-            userDatabase.remove(u.username());
-        }
+        throwExIfInvalid(u.username());
+        userDatabase.remove(u.username());
     }
 
     public void clear() {
         userDatabase.clear();
     }
 
-    // didn't create an update method... Not sure what that will look like...
-
-
+    public void throwExIfInvalid(String username) throws DataAccessException {
+        if(!userDatabase.containsKey(username)) {
+            throw new BadRequestException();
+        }
+    }
 }
