@@ -24,6 +24,10 @@ public class UserService {
         String pass = request.password();
         String mail = request.email();
 
+        if((user==null) || (pass==null) || (mail==null)) {
+            throw new BadRequestException();
+        }
+
         UserData userData = new UserData(user, pass, mail);
         udb.insertUser(userData);
 
@@ -39,7 +43,7 @@ public class UserService {
 
         UserData userData = udb.getUser(user);
         if(!userData.password().equals(pass)) {
-            throw new DataAccessException("Incorrect username or password");
+            throw new InvalidAuthException();
         }
 
         String authToken = returnAuth();
