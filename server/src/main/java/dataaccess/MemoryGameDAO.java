@@ -21,37 +21,29 @@ public class MemoryGameDAO implements GameDAO {
         gameDatabase.put(g.gameID(), g);
     }
 
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
+        throwExIfInvalid(gameID);
         return gameDatabase.get(gameID);
     }
-
-    public boolean gameExists(GameData g) {
-        return gameDatabase.containsKey(g.gameID());
-    }
-
-    public boolean gameExists(int gameID) {
-        return gameDatabase.containsKey(gameID);
-    }
-
-
 
     public List<GameData> listGames() {
         return new ArrayList<>(gameDatabase.values());
     }
 
-    public void updateGame(int gameID, String newName) {
+    public boolean gameExists(int id) {
+        return gameDatabase.containsKey(id);
+    }
+
+    public void updateGame(int gameID, String newName) throws DataAccessException {
+        throwExIfInvalid(gameID);
         // the spec wasn't super clear... This might need change the actual chessboard.
         GameData game = getGame(gameID);
         game.changeGameName(newName);
     }
 
     public void deleteGame(GameData g) throws DataAccessException {
-        if(!gameExists(g)) {
-            throw new DataAccessException("user doesn't exist");
-        }
-        else {
-            gameDatabase.remove(g.gameID());
-        }
+        throwExIfInvalid(g.gameID());
+        gameDatabase.remove(g.gameID());
     }
 
     public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) {
@@ -61,6 +53,12 @@ public class MemoryGameDAO implements GameDAO {
 
     public void clear() {
         gameDatabase.clear();
+    }
+
+    public void throwExIfInvalid(int gameID) throws DataAccessException {
+        if (!gameDatabase.containsKey(gameID)) {
+            throw new DataAccessException("Invalid game ID");
+        }
     }
     
     
