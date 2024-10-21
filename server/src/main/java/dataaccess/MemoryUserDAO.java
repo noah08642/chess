@@ -14,6 +14,9 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void insertUser(UserData u) throws DataAccessException {
+        if (userExists(u)) {
+            throw new DataAccessException("Username taken");
+        }
         userDatabase.put(u.username(), u);
     }
 

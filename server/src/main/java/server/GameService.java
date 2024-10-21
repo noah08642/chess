@@ -62,8 +62,6 @@ public class GameService {
         // not sure how games should be passed... as a list or map?
     }
 
-
-
     public int generateID() {
         GameIdGenerator gen = new GameIdGenerator();
         return gen.generate(gdb);

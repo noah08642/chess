@@ -27,8 +27,10 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         Spark.post("/user", Server::handleRegister);
+        Spark.post("/session", Server::handleLogin);
+        Spark.delete("session", Server::handleLogout);
 
-        Spark.delete("/db", ((request, response) -> "goodbye!"));
+        Spark.delete("/db", (request, response) -> "goodbye!");
 
 
 
@@ -45,10 +47,20 @@ public class Server {
     }
 
     public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
-        String body = req.body();
-        UserHandler userHandler = new UserHandler(body, udb, adb)   ;
-        System.out.println(userHandler.handleRegister());
+        UserHandler userHandler = new UserHandler(req, udb, adb)   ;
         res.body(userHandler.handleRegister());
-        return "";
+        return res.body();
+    }
+
+    public static String handleLogin(spark.Request req, spark.Response res) throws DataAccessException {
+        UserHandler userHandler = new UserHandler(req, udb, adb);
+        res.body(userHandler.handleLogin());
+        return res.body();
+    }
+
+    public static String handleLogout(spark.Request req, spark.Response res) throws DataAccessException {
+        UserHandler userHandler = new UserHandler(req, udb, adb);
+        userHandler.handleLogout();
+        return res.body();
     }
 }

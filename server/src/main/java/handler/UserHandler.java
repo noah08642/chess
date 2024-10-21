@@ -1,26 +1,27 @@
 package handler;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LogRegResult;
+import result.LogoutResult;
 import server.UserService;
 
 public class UserHandler {
 
-    String jsonFile;
+    spark.Request req;
     UserService userService;
 
-    public UserHandler(String jsonFile, MemoryUserDAO udb, MemoryAuthDAO adb) {
-        this.jsonFile = jsonFile;
+    public UserHandler(spark.Request req, MemoryUserDAO udb, MemoryAuthDAO adb) {
+        this.req = req;
         this.userService = new UserService(udb, adb);
     }
 
     public String handleLogin() throws DataAccessException {
         var serializer = new Gson();
-        var loginObject = serializer.fromJson(jsonFile, LoginRequest.class);
+        var loginObject = serializer.fromJson(req.body(), LoginRequest.class);
         LogRegResult result = userService.login(loginObject);
 
         return serializer.toJson(result);
@@ -28,20 +29,16 @@ public class UserHandler {
 
     public String handleRegister() throws DataAccessException {
         var serializer = new Gson();
-        var registerObject = serializer.fromJson(jsonFile, RegisterRequest.class);
+        var registerObject = serializer.fromJson(req.body(), RegisterRequest.class);
         LogRegResult result = userService.register(registerObject);
 
         return serializer.toJson(result);
     }
 
-    void handleLogout() throws DataAccessException {
+    public void handleLogout() throws DataAccessException {
         var serializer = new Gson();
-        var logoutObject = serializer.fromJson(jsonFile, RegisterRequest.class);
-        userService.register(logoutObject);
+        System.out.println(req.headers().toString());
+        var logoutObject = serializer.fromJson(req.headers().toString(), LogoutRequest.class);
+        userService.logout(logoutObject);
     }
-
-    // converts http gson call
-
-
-
 }

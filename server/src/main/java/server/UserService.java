@@ -44,7 +44,7 @@ public class UserService {
 
         UserData userData = udb.getUser(user);
         if(!userData.password().equals(pass)) {
-            throw new DataAccessException("Wrong Password");
+            throw new DataAccessException("Incorrect username or password");
         }
 
         String authToken = returnAuth();
