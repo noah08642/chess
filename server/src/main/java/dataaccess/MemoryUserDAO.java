@@ -40,7 +40,7 @@ public class MemoryUserDAO implements UserDAO {
 
     public void throwExIfInvalid(String username) throws DataAccessException {
         if(!userDatabase.containsKey(username)) {
-            throw new BadRequestException();
+            throw new InvalidAuthException();
         }
     }
 }

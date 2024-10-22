@@ -34,7 +34,7 @@ public class GameService {
         // authenticate, generate id, add to database
         adb.throwExIfInvalid(authToken);
         int id = generateID();
-        GameData g = new GameData(id, "", "", gameName, new ChessGame());
+        GameData g = new GameData(id, null, null, gameName, new ChessGame());
         gdb.insertGame(g);
 
         // create and return returnObject
@@ -52,15 +52,18 @@ public class GameService {
 
         GameData g = gdb.getGame(id);
 
+        if (color == null) {
+            throw new BadRequestException();
+        }
         // throw error if color is already taken
         if (color == ChessGame.TeamColor.WHITE) {
-            if (!Objects.equals(g.whiteUsername(), "")) {
-                throw new BadRequestException();
+            if (!Objects.equals(g.whiteUsername(), null)) {
+                throw new AlreadyTakenException();
             }
         }
         else {
-            if (!Objects.equals(g.blackUsername(), "")) {
-                throw new BadRequestException();
+            if (!Objects.equals(g.blackUsername(), null)) {
+                throw new AlreadyTakenException();
             }
         }
 

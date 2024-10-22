@@ -41,6 +41,7 @@ public class UserService {
         String user = request.username();
         String pass = request.password();
 
+
         UserData userData = udb.getUser(user);
         if(!userData.password().equals(pass)) {
             throw new InvalidAuthException();
