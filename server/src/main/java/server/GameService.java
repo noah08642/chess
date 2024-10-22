@@ -2,8 +2,8 @@ package server;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.GameData;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
@@ -15,16 +15,15 @@ import java.util.Objects;
 
 public class GameService {
 
-    private MemoryGameDAO gdb;
-    private MemoryAuthDAO adb;
-    private MemoryUserDAO udb;
+    private final MemoryGameDAO gdb;
+    private final MemoryAuthDAO adb;
+    private final MemoryUserDAO udb;
 
     public GameService(MemoryGameDAO gdb, MemoryAuthDAO adb, MemoryUserDAO udb) {
         this.adb = adb;
         this.gdb = gdb;
         this.udb = udb;
     }
-
 
 
     public CreateJoinResult create(CreateGameRequest request) throws DataAccessException {
@@ -60,8 +59,7 @@ public class GameService {
             if (!Objects.equals(g.whiteUsername(), null)) {
                 throw new AlreadyTakenException();
             }
-        }
-        else {
+        } else {
             if (!Objects.equals(g.blackUsername(), null)) {
                 throw new AlreadyTakenException();
             }

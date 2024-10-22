@@ -11,7 +11,7 @@ import java.util.Map;
 public class MemoryGameDAO implements GameDAO {
 
 
-    private Map<Integer, GameData> gameDatabase;
+    private final Map<Integer, GameData> gameDatabase;
 
     public MemoryGameDAO() {
         gameDatabase = new HashMap<>();
@@ -60,8 +60,6 @@ public class MemoryGameDAO implements GameDAO {
             throw new BadRequestException();
         }
     }
-    
-    
-    
-    
+
+
 }

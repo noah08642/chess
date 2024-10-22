@@ -8,7 +8,7 @@ public class RookMoveCalculator implements PieceMovesCalculator {
     private final ChessPosition position;
     private final ChessBoard board;
 
-    RookMoveCalculator( ChessBoard board, ChessPosition position) {
+    RookMoveCalculator(ChessBoard board, ChessPosition position) {
         this.position = position;
         this.board = board;
     }
@@ -18,11 +18,10 @@ public class RookMoveCalculator implements PieceMovesCalculator {
     public Collection<ChessMove> calculateMoves() {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        moveDirection(position, board, moves, 0,1);
-        moveDirection(position, board, moves, 0,-1);
-        moveDirection(position, board, moves, 1,0);
-        moveDirection(position, board, moves, -1,0);
-
+        moveDirection(position, board, moves, 0, 1);
+        moveDirection(position, board, moves, 0, -1);
+        moveDirection(position, board, moves, 1, 0);
+        moveDirection(position, board, moves, -1, 0);
 
 
         return moves;

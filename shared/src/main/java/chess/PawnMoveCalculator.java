@@ -23,24 +23,18 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
             if (position.getRow() == 2) {
                 normalPawnMove(moves, color);
                 doubleMove(moves, color);
-            }
-            else if (position.getRow() == 7) {
+            } else if (position.getRow() == 7) {
                 promotionPawnMove(moves, color);
-            }
-            else {
+            } else {
                 normalPawnMove(moves, color);
             }
-        }
-
-        else if (color == ChessGame.TeamColor.BLACK) {
+        } else if (color == ChessGame.TeamColor.BLACK) {
             if (position.getRow() == 7) {
-                    normalPawnMove(moves, color);
-                    doubleMove(moves, color);
-            }
-            else if (position.getRow() == 2) {
+                normalPawnMove(moves, color);
+                doubleMove(moves, color);
+            } else if (position.getRow() == 2) {
                 promotionPawnMove(moves, color);
-            }
-            else {
+            } else {
                 normalPawnMove(moves, color);
             }
         }
@@ -57,7 +51,7 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
         ChessPosition newPosition = new ChessPosition(row + direction, column);
         if (vacant(row + direction, column, board)) {
             moves.add(createMove(position, newPosition));
-            }
+        }
         ChessPosition newPosition2 = new ChessPosition(row + direction, column + 1);
         if (inbounds(newPosition2)) {
             if (isEnemy(position, newPosition2, board)) {
@@ -81,7 +75,7 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
 
         int row = position.getRow();
         int column = position.getColumn();
-        if (vacant(row + direction, column, board) && vacant(row + (direction/2), column, board)) {
+        if (vacant(row + direction, column, board) && vacant(row + (direction / 2), column, board)) {
             ChessMove newMove = new ChessMove(position, new ChessPosition(row + direction, column), null);
             moves.add(newMove);
         }

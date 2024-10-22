@@ -6,9 +6,9 @@ import dataaccess.MemoryUserDAO;
 
 public class Clear {
 
-    private MemoryGameDAO gdb;
-    private MemoryAuthDAO adb;
-    private MemoryUserDAO udb;
+    private final MemoryGameDAO gdb;
+    private final MemoryAuthDAO adb;
+    private final MemoryUserDAO udb;
 
     public Clear(MemoryGameDAO gdb, MemoryAuthDAO adb, MemoryUserDAO udb) {
         this.adb = adb;

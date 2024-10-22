@@ -1,12 +1,13 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.*;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryUserDAO;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LogRegResult;
-import result.LogoutResult;
 import server.UserService;
 
 public class UserHandler {

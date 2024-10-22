@@ -26,7 +26,6 @@ public final class ChessMove {
     }
 
 
-
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -46,8 +45,7 @@ public final class ChessMove {
     public String toString() {
         if (promotionPiece == null) {
             return startPosition + " to " + endPosition;
-        }
-        else {
+        } else {
             return startPosition + " " + endPosition + " " + promotionPiece;
         }
     }

@@ -13,7 +13,8 @@ public class ChessBoard implements Cloneable {
 
     private ChessPiece[][] squares = new ChessPiece[8][8];
 
-    public ChessBoard() {}
+    public ChessBoard() {
+    }
 
     public ChessPiece[][] getBoard() {
         return squares;
@@ -30,13 +31,13 @@ public class ChessBoard implements Cloneable {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow() -1 ][position.getColumn() - 1] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     public void addPiece(int row, int col, ChessPiece.PieceType type, ChessGame.TeamColor color) {
         ChessPiece piece = new ChessPiece(color, type);
         ChessPosition position = new ChessPosition(row, col);
-        squares[position.getRow() -1 ][position.getColumn() - 1] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -56,44 +57,42 @@ public class ChessBoard implements Cloneable {
      */
     public void resetBoard() {
 
-        addPiece(1,1, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE);
-        addPiece(1,2, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE);
-        addPiece(1,3, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE);
-        addPiece(1,4, ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.WHITE);
-        addPiece(1,5, ChessPiece.PieceType.KING, ChessGame.TeamColor.WHITE);
-        addPiece(1,6, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE);
-        addPiece(1,7, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE);
-        addPiece(1,8, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE);
+        addPiece(1, 1, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE);
+        addPiece(1, 2, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE);
+        addPiece(1, 3, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE);
+        addPiece(1, 4, ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.WHITE);
+        addPiece(1, 5, ChessPiece.PieceType.KING, ChessGame.TeamColor.WHITE);
+        addPiece(1, 6, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.WHITE);
+        addPiece(1, 7, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.WHITE);
+        addPiece(1, 8, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.WHITE);
 
-        addPiece(2,1, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,2, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,3, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,4, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,5, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,6, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,7, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        addPiece(2,8, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-
-
-        addPiece(8,1, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK);
-        addPiece(8,2, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK);
-        addPiece(8,3, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK);
-        addPiece(8,4, ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.BLACK);
-        addPiece(8,5, ChessPiece.PieceType.KING, ChessGame.TeamColor.BLACK);
-        addPiece(8,6, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK);
-        addPiece(8,7, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK);
-        addPiece(8,8, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK);
-
-        addPiece(7,1, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,2, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,3, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,4, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,5, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,6, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,7, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
-        addPiece(7,8, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(2, 1, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 2, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 3, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 4, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 5, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 6, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 7, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        addPiece(2, 8, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
 
 
+        addPiece(8, 1, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK);
+        addPiece(8, 2, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK);
+        addPiece(8, 3, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK);
+        addPiece(8, 4, ChessPiece.PieceType.QUEEN, ChessGame.TeamColor.BLACK);
+        addPiece(8, 5, ChessPiece.PieceType.KING, ChessGame.TeamColor.BLACK);
+        addPiece(8, 6, ChessPiece.PieceType.BISHOP, ChessGame.TeamColor.BLACK);
+        addPiece(8, 7, ChessPiece.PieceType.KNIGHT, ChessGame.TeamColor.BLACK);
+        addPiece(8, 8, ChessPiece.PieceType.ROOK, ChessGame.TeamColor.BLACK);
+
+        addPiece(7, 1, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 2, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 3, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 4, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 5, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 6, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 7, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
+        addPiece(7, 8, ChessPiece.PieceType.PAWN, ChessGame.TeamColor.BLACK);
 
 
     }
@@ -104,9 +103,7 @@ public class ChessBoard implements Cloneable {
             ChessBoard clone = (ChessBoard) super.clone();
             ChessPiece[][] newSquares = new ChessPiece[8][8];
             for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    newSquares[i][j] = squares[i][j];
-                }
+                System.arraycopy(squares[i], 0, newSquares[i], 0, 8);
             }
             clone.squares = newSquares;
 
@@ -138,8 +135,7 @@ public class ChessBoard implements Cloneable {
             for (int j = 0; j < 8; j++) {
                 if (squares[i][j] == null) {
                     sb.append(" ");
-                }
-                else {
+                } else {
                     sb.append(squares[i][j]);
                 }
                 if (j < squares[i].length - 1) {

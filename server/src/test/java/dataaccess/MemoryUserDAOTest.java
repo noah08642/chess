@@ -3,8 +3,6 @@ package dataaccess;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import request.RegisterRequest;
-import server.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,7 +16,7 @@ public class MemoryUserDAOTest {
     }
 
     @Test
-    public void getNonexistentUser()  {
+    public void getNonexistentUser() {
         DataAccessException exception = assertThrows(DataAccessException.class, () -> udb.getUser("Luke"));
         assertEquals("user is not in database", exception.getMessage());
     }

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO {
 
-    private Map<String, UserData> userDatabase;
+    private final Map<String, UserData> userDatabase;
 
     public MemoryUserDAO() {
         userDatabase = new HashMap<>();
@@ -39,7 +39,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     public void throwExIfInvalid(String username) throws DataAccessException {
-        if(!userDatabase.containsKey(username)) {
+        if (!userDatabase.containsKey(username)) {
             throw new InvalidAuthException();
         }
     }

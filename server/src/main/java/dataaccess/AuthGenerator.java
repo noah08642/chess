@@ -1,4 +1,5 @@
 package dataaccess;
+
 import java.util.UUID;
 
 public class AuthGenerator {

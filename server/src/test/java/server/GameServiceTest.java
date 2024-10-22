@@ -1,11 +1,16 @@
 package server;
 
 import chess.ChessGame;
-import dataaccess.*;
-import org.junit.jupiter.api.Assertions;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import request.*;
+import request.CreateGameRequest;
+import request.JoinGameRequest;
+import request.ListRequest;
+import request.RegisterRequest;
 import result.CreateJoinResult;
 import result.ListResult;
 import result.LogRegResult;
@@ -83,10 +88,11 @@ public class GameServiceTest {
         CreateGameRequest request = new CreateGameRequest("game1", authToken);
         gameService.create(request);
 
-        ListRequest listRequest= new ListRequest(authToken);
+        ListRequest listRequest = new ListRequest(authToken);
         ListResult listResult = gameService.list(listRequest);
         assertEquals(listResult.games().getFirst().gameName(), "game1");
     }
+
     @Test
     public void listNegative() throws DataAccessException {
         // Create a game
@@ -94,11 +100,10 @@ public class GameServiceTest {
         gameService.create(request);
 
         // request with invalid authToken
-        ListRequest listRequest= new ListRequest("BadToken");
+        ListRequest listRequest = new ListRequest("BadToken");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.list(listRequest));
         assertEquals("Error: unauthorized", exception.getMessage());
     }
-
 
 
     @Test
@@ -112,24 +117,6 @@ public class GameServiceTest {
         int id = gameService.generateID();
         assertEquals(id, id);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

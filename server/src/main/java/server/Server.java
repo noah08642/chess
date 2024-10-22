@@ -1,13 +1,12 @@
 package server;
+
+import com.google.gson.Gson;
 import dataaccess.*;
 import handler.ClearHandler;
 import handler.GameHandler;
 import handler.UserHandler;
-import request.ListRequest;
 import result.ErrorResult;
-import result.ListResult;
-import spark.*;
-import com.google.gson.Gson;
+import spark.Spark;
 
 public class Server {
 
@@ -34,7 +33,6 @@ public class Server {
         Spark.post("/game", Server::handleCreate);
         Spark.put("/game", Server::handleJoin);
         Spark.delete("db", Server::handleClear);
-
 
 
         // Global exception handling
@@ -73,7 +71,7 @@ public class Server {
 
 
     public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
-        UserHandler userHandler = new UserHandler(req, udb, adb)   ;
+        UserHandler userHandler = new UserHandler(req, udb, adb);
         res.body(userHandler.handleRegister());
         res.status(200);
         return res.body();

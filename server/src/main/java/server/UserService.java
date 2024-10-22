@@ -24,7 +24,7 @@ public class UserService {
         String pass = request.password();
         String mail = request.email();
 
-        if((user==null) || (pass==null) || (mail==null)) {
+        if ((user == null) || (pass == null) || (mail == null)) {
             throw new BadRequestException();
         }
 
@@ -43,7 +43,7 @@ public class UserService {
 
 
         UserData userData = udb.getUser(user);
-        if(!userData.password().equals(pass)) {
+        if (!userData.password().equals(pass)) {
             throw new InvalidAuthException();
         }
 
@@ -53,7 +53,7 @@ public class UserService {
         return new LogRegResult(user, authToken);
     }
 
-    public void logout(LogoutRequest request) throws DataAccessException{
+    public void logout(LogoutRequest request) throws DataAccessException {
         adb.deleteAuth(request.authToken());
     }
 
@@ -61,8 +61,6 @@ public class UserService {
         AuthGenerator a = new AuthGenerator();
         return a.generate();
     }
-
-
 
 
     //public AuthData register(UserData user) {}

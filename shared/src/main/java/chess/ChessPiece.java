@@ -1,8 +1,6 @@
 package chess;
 
 import java.util.Collection;
-
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class ChessPiece {
@@ -15,17 +13,6 @@ public class ChessPiece {
         this.pieceType = type;
     }
 
-
-    public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
-    }
-
-
     public ChessGame.TeamColor getTeamColor() {
         return teamColor;
     }
@@ -33,7 +20,6 @@ public class ChessPiece {
     public PieceType getPieceType() {
         return pieceType;
     }
-
 
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         switch (pieceType) {
@@ -75,7 +61,7 @@ public class ChessPiece {
     @Override
     public String toString() {
 
-        if(teamColor == null) {
+        if (teamColor == null) {
             return " ";
         }
 
@@ -114,5 +100,14 @@ public class ChessPiece {
         }
 
         return null;
+    }
+
+    public enum PieceType {
+        KING,
+        QUEEN,
+        BISHOP,
+        KNIGHT,
+        ROOK,
+        PAWN
     }
 }

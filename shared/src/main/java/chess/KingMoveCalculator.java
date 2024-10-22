@@ -14,10 +14,9 @@ public class KingMoveCalculator implements PieceMovesCalculator {
     }
 
 
-
     @Override
-    public Collection<ChessMove> calculateMoves(){
-        Collection <ChessMove> moves = new ArrayList<>();
+    public Collection<ChessMove> calculateMoves() {
+        Collection<ChessMove> moves = new ArrayList<>();
 
         addIfValidMove(position, -1, 1, board, moves);
         addIfValidMove(position, 0, 1, board, moves);

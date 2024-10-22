@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface PieceMovesCalculator {
 
-    public Collection<ChessMove> calculateMoves();
+    Collection<ChessMove> calculateMoves();
 
     default boolean vacant(int row, int column, ChessBoard board) {
         ChessPosition position = new ChessPosition(row, column);
@@ -46,17 +46,15 @@ public interface PieceMovesCalculator {
         return new ChessMove(startPosition, endPosition, null);
     }
 
-    default void addIfValidMove (ChessPosition startPosition, int rowChange, int colChange, ChessBoard board, Collection<ChessMove> moves) {
+    default void addIfValidMove(ChessPosition startPosition, int rowChange, int colChange, ChessBoard board, Collection<ChessMove> moves) {
         ChessPosition newPosition = new ChessPosition(startPosition.getRow() + rowChange, startPosition.getColumn() + colChange);
-        if (inbounds(newPosition)){
+        if (inbounds(newPosition)) {
             ChessPiece piece = board.getPiece(newPosition);
             if (piece == null || !isTeammate(board.getPiece(startPosition).getTeamColor(), newPosition, board)) {
                 moves.add(createMove(startPosition, newPosition));
             }
         }
     }
-
-
 
 
     default void moveDirection(ChessPosition position, ChessBoard board, Collection<ChessMove> moves, int incrementVert, int incrementHor) {
@@ -69,8 +67,7 @@ public interface PieceMovesCalculator {
                 addIfValidMove(position, incrementHor, incrementVert, board, moves);
                 incrementHor += horDirection;
                 incrementVert += vertDirection;
-            }
-            else {
+            } else {
                 if (!isTeammate(board.getPiece(position).getTeamColor(), row + incrementHor, column + incrementVert, board)) {
                     addIfValidMove(position, incrementHor, incrementVert, board, moves);
                 }

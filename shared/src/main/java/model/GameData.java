@@ -1,14 +1,15 @@
 package model;
+
 import chess.ChessGame;
 
 import java.util.Objects;
 
 public final class GameData {
     private final int gameID;
-    private  String whiteUsername;
-    private  String blackUsername;
-    private String gameName;
     private final ChessGame game;
+    private String whiteUsername;
+    private String blackUsername;
+    private String gameName;
 
     public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
@@ -35,10 +36,9 @@ public final class GameData {
     }
 
     public void addUser(ChessGame.TeamColor color, String user) {
-        if (color== ChessGame.TeamColor.BLACK) {
+        if (color == ChessGame.TeamColor.BLACK) {
             blackUsername = user;
-        }
-        else {
+        } else {
             whiteUsername = user;
         }
 
