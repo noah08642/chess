@@ -29,10 +29,6 @@ public class MemoryUserDAO implements UserDAO {
         return userDatabase.containsKey(u.username());
     }
 
-    public void deleteUser(UserData u) throws DataAccessException {
-        throwExIfInvalid(u.username());
-        userDatabase.remove(u.username());
-    }
 
     public void clear() {
         userDatabase.clear();

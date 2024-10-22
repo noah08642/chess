@@ -19,10 +19,6 @@ public final class GameData {
         this.game = game;
     }
 
-    public void changeGameName(String newName) {
-        gameName = newName;
-    }
-
     public int gameID() {
         return gameID;
     }
@@ -47,10 +43,6 @@ public final class GameData {
 
     public String gameName() {
         return gameName;
-    }
-
-    public ChessGame game() {
-        return game;
     }
 
     @Override

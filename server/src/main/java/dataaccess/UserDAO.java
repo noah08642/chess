@@ -10,8 +10,6 @@ public interface UserDAO {
 
     boolean userExists(UserData u);
 
-    void deleteUser(UserData u) throws DataAccessException;
-
     void clear();
 
     void throwExIfInvalid(String username) throws DataAccessException;

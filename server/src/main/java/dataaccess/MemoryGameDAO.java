@@ -34,12 +34,6 @@ public class MemoryGameDAO implements GameDAO {
         return gameDatabase.containsKey(id);
     }
 
-
-    public void deleteGame(GameData g) throws DataAccessException {
-        throwExIfInvalid(g.gameID());
-        gameDatabase.remove(g.gameID());
-    }
-
     public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) {
         GameData g = gameDatabase.get(gameID);
         g.addUser(playerColor, user);

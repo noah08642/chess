@@ -16,8 +16,6 @@ public interface GameDAO {
 
     List<GameData> listGames();
 
-    void deleteGame(GameData u) throws DataAccessException;
-
     void clear();
 
     void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user);
