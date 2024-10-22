@@ -106,17 +106,4 @@ public class GameServiceTest {
     }
 
 
-    @Test
-    public void generatePositive() {
-        int id = gameService.generateID();
-        assertNotNull(id);
-    }
-
-    @Test
-    public void generateNegative() {
-        int id = gameService.generateID();
-        assertEquals(id, id);
-    }
-
-
 }

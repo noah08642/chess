@@ -78,7 +78,7 @@ public class GameService {
         return new ListResult(gdb.listGames());
     }
 
-    public int generateID() {
+    private int generateID() {
         GameIdGenerator gen = new GameIdGenerator();
         return gen.generate(gdb);
     }

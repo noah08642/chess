@@ -57,7 +57,7 @@ public class UserService {
         adb.deleteAuth(request.authToken());
     }
 
-    public String returnAuth() {
+    private String returnAuth() {
         AuthGenerator a = new AuthGenerator();
         return a.generate();
     }
