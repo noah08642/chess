@@ -8,20 +8,24 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.LoginRequest;
+import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LogRegResult;
+import result.LogoutResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
 
     private UserService userService;
+    private MemoryAuthDAO adb;
 
 
     @BeforeEach
     public void setUp() {
         MemoryUserDAO udb = new MemoryUserDAO();
         MemoryAuthDAO adb = new MemoryAuthDAO();
+        this.adb = adb;
         userService = new UserService(udb, adb);
     }
 
@@ -69,11 +73,30 @@ public class UserServiceTest {
         // test login with incorrect password
         LoginRequest request = new LoginRequest("noah", "poopy");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> userService.login(request));
-        assertEquals("Incorrect username or password", exception.getMessage());
+        assertEquals("Error: unauthorized", exception.getMessage());
 
         // test login with incorrect user
         LoginRequest request2 = new LoginRequest("noahGoo", "poop");
         DataAccessException exception2 = assertThrows(DataAccessException.class, () -> userService.login(request2));
-        assertEquals("Incorrect username or password", exception.getMessage());
+        assertEquals("Error: unauthorized", exception.getMessage());
+    }
+
+    @Test
+    public void logoutPositive() throws DataAccessException {
+        RegisterRequest request = new RegisterRequest("Luke", "Passwordy", "luke@gmail.com");
+        LogRegResult result = userService.register(request);
+        String auth = result.authToken();
+
+        LogoutRequest logoutRequest = new LogoutRequest(auth);
+        userService.logout(logoutRequest);
+
+        assertThrows(DataAccessException.class, () -> adb.throwExIfInvalid(auth));
+    }
+
+    @Test
+    public void logoutNegative() throws DataAccessException {
+
+        LogoutRequest logoutRequest = new LogoutRequest("badToken");
+        assertThrows(DataAccessException.class, () -> userService.logout(logoutRequest));
     }
 }

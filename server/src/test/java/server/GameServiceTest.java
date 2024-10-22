@@ -1,10 +1,8 @@
 package server;
 
 import chess.ChessGame;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.*;
@@ -99,6 +97,20 @@ public class GameServiceTest {
         ListRequest listRequest= new ListRequest("BadToken");
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.list(listRequest));
         assertEquals("Error: unauthorized", exception.getMessage());
+    }
+
+
+
+    @Test
+    public void generatePositive() {
+        int id = gameService.generateID();
+        assertNotNull(id);
+    }
+
+    @Test
+    public void generateNegative() {
+        int id = gameService.generateID();
+        assertEquals(id, id);
     }
 
 
