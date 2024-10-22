@@ -1,5 +1,7 @@
-package server;
+package service;
 
+import service.GameService;
+import service.UserService;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
@@ -79,7 +81,7 @@ public class GameServiceTest {
 
         // join game with same color
         DataAccessException exception = assertThrows(DataAccessException.class, () -> gameService.join(request));
-        assertEquals("Color already taken", exception.getMessage());
+        assertEquals("Error: already taken", exception.getMessage());
     }
 
     @Test

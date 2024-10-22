@@ -1,5 +1,6 @@
-package server;
+package service;
 
+import service.Clear;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;

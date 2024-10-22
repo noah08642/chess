@@ -10,7 +10,7 @@ import request.JoinGameRequest;
 import request.ListRequest;
 import result.CreateJoinResult;
 import result.ListResult;
-import server.GameService;
+import service.GameService;
 
 public class GameHandler {
 

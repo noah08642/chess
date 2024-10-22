@@ -1,5 +1,6 @@
-package server;
+package service;
 
+import service.UserService;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;

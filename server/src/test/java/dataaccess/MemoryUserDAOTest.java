@@ -18,7 +18,7 @@ public class MemoryUserDAOTest {
     @Test
     public void getNonexistentUser() {
         DataAccessException exception = assertThrows(DataAccessException.class, () -> udb.getUser("Luke"));
-        assertEquals("user is not in database", exception.getMessage());
+        assertEquals("Error: unauthorized", exception.getMessage());
     }
 
 

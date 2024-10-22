@@ -3,7 +3,7 @@ package handler;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
-import server.Clear;
+import service.Clear;
 
 public class ClearHandler {
 

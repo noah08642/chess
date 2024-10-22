@@ -8,7 +8,7 @@ import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
 import result.LogRegResult;
-import server.UserService;
+import service.UserService;
 
 public class UserHandler {
 
