@@ -67,7 +67,8 @@ public interface PieceMovesCalculator {
                 addIfValidMove(position, incrementHor, incrementVert, board, moves);
                 incrementHor += horDirection;
                 incrementVert += vertDirection;
-            } else {
+            }
+            else {
                 if (!isTeammate(board.getPiece(position).getTeamColor(), row + incrementHor, column + incrementVert, board)) {
                     addIfValidMove(position, incrementHor, incrementVert, board, moves);
                 }

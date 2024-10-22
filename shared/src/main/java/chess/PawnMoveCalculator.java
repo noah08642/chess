@@ -23,18 +23,23 @@ public class PawnMoveCalculator implements PieceMovesCalculator {
             if (position.getRow() == 2) {
                 normalPawnMove(moves, color);
                 doubleMove(moves, color);
-            } else if (position.getRow() == 7) {
+            }
+            else if (position.getRow() == 7) {
                 promotionPawnMove(moves, color);
-            } else {
+            }
+            else {
                 normalPawnMove(moves, color);
             }
-        } else if (color == ChessGame.TeamColor.BLACK) {
+        }
+        else if (color == ChessGame.TeamColor.BLACK) {
             if (position.getRow() == 7) {
                 normalPawnMove(moves, color);
                 doubleMove(moves, color);
-            } else if (position.getRow() == 2) {
+            }
+            else if (position.getRow() == 2) {
                 promotionPawnMove(moves, color);
-            } else {
+            }
+            else {
                 normalPawnMove(moves, color);
             }
         }

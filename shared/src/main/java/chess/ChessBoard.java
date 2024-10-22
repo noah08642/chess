@@ -20,7 +20,7 @@ public class ChessBoard implements Cloneable {
         return squares;
     }
 
-    public boolean Vacant(int i, int j) {
+    public boolean vacant(int i, int j) {
         return squares[i][j] == null;
     }
 
@@ -116,8 +116,12 @@ public class ChessBoard implements Cloneable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(squares, that.squares);
     }
@@ -135,7 +139,8 @@ public class ChessBoard implements Cloneable {
             for (int j = 0; j < 8; j++) {
                 if (squares[i][j] == null) {
                     sb.append(" ");
-                } else {
+                }
+                else {
                     sb.append(squares[i][j]);
                 }
                 if (j < squares[i].length - 1) {

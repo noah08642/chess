@@ -76,9 +76,6 @@ public class ChessGame {
         return false;
     }
 
-    // code for commit requirement
-    // code for commit requirement
-    // code for commit requirement
 
 
     public boolean isInCheckmate(TeamColor teamColor) {
@@ -102,7 +99,8 @@ public class ChessGame {
                     }
                 }
             }
-        } else {
+        }
+        else {
             return false;
         }
         return true;
@@ -123,7 +121,8 @@ public class ChessGame {
                     }
                 }
             }
-        } else {
+        }
+        else {
             return false;
         }
 
@@ -164,7 +163,8 @@ public class ChessGame {
 
         if (move.promotionPiece() != null) {
             board.addPiece(end, new ChessPiece(piece.getTeamColor(), move.promotionPiece()));
-        } else {
+        }
+        else {
             board.addPiece(end, piece);
         }
         board.addPiece(start, null);

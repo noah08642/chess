@@ -34,12 +34,6 @@ public class MemoryGameDAO implements GameDAO {
         return gameDatabase.containsKey(id);
     }
 
-    public void updateGame(int gameID, String newName) throws DataAccessException {
-        throwExIfInvalid(gameID);
-        // the spec wasn't super clear... This might need change the actual chessboard.
-        GameData game = getGame(gameID);
-        game.changeGameName(newName);
-    }
 
     public void deleteGame(GameData g) throws DataAccessException {
         throwExIfInvalid(g.gameID());

@@ -28,8 +28,12 @@ public final class ChessMove {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (ChessMove) obj;
         return Objects.equals(this.startPosition, that.startPosition) &&
                 Objects.equals(this.endPosition, that.endPosition) &&
@@ -45,7 +49,8 @@ public final class ChessMove {
     public String toString() {
         if (promotionPiece == null) {
             return startPosition + " to " + endPosition;
-        } else {
+        }
+        else {
             return startPosition + " " + endPosition + " " + promotionPiece;
         }
     }

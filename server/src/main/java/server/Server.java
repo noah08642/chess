@@ -20,6 +20,55 @@ public class Server {
         gdb = new MemoryGameDAO();
     }
 
+    public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
+        UserHandler userHandler = new UserHandler(req, udb, adb);
+        res.body(userHandler.handleRegister());
+        res.status(200);
+        return res.body();
+    }
+
+    public static String handleLogin(spark.Request req, spark.Response res) throws DataAccessException {
+        UserHandler userHandler = new UserHandler(req, udb, adb);
+        res.body(userHandler.handleLogin());
+        res.status(200);
+        return res.body();
+    }
+
+    public static String handleLogout(spark.Request req, spark.Response res) throws DataAccessException {
+        UserHandler userHandler = new UserHandler(req, udb, adb);
+        userHandler.handleLogout();
+        res.status(200);
+        return "";
+    }
+
+    // game
+    public static String handleList(spark.Request req, spark.Response res) throws DataAccessException {
+        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
+        res.body(gameHandler.handleList());
+        res.status(200);
+        return res.body();
+    }
+
+    public static String handleCreate(spark.Request req, spark.Response res) throws DataAccessException {
+        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
+        res.body(gameHandler.handleCreate());
+        res.status(200);
+        return res.body();
+    }
+
+    public static String handleJoin(spark.Request req, spark.Response res) throws DataAccessException {
+        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
+        res.body(gameHandler.handleJoin());
+        res.status(200);
+        return res.body();
+    }
+
+    public static String handleClear(spark.Request req, spark.Response res) {
+        ClearHandler clearHandler = new ClearHandler(udb, adb, gdb);
+        res.status(200);
+        return "";
+    }
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -57,7 +106,7 @@ public class Server {
         });
 
 
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
         Spark.awaitInitialization();
@@ -67,57 +116,6 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
-    }
-
-
-    public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
-        UserHandler userHandler = new UserHandler(req, udb, adb);
-        res.body(userHandler.handleRegister());
-        res.status(200);
-        return res.body();
-    }
-
-    public static String handleLogin(spark.Request req, spark.Response res) throws DataAccessException {
-        UserHandler userHandler = new UserHandler(req, udb, adb);
-        res.body(userHandler.handleLogin());
-        res.status(200);
-        return res.body();
-    }
-
-    public static String handleLogout(spark.Request req, spark.Response res) throws DataAccessException {
-        UserHandler userHandler = new UserHandler(req, udb, adb);
-        userHandler.handleLogout();
-        res.status(200);
-        return "";
-    }
-
-
-    // game
-    public static String handleList(spark.Request req, spark.Response res) throws DataAccessException {
-        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
-        res.body(gameHandler.handleList());
-        res.status(200);
-        return res.body();
-    }
-
-    public static String handleCreate(spark.Request req, spark.Response res) throws DataAccessException {
-        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
-        res.body(gameHandler.handleCreate());
-        res.status(200);
-        return res.body();
-    }
-
-    public static String handleJoin(spark.Request req, spark.Response res) throws DataAccessException {
-        GameHandler gameHandler = new GameHandler(req, udb, adb, gdb);
-        res.body(gameHandler.handleJoin());
-        res.status(200);
-        return res.body();
-    }
-
-    public static String handleClear(spark.Request req, spark.Response res) {
-        ClearHandler clearHandler = new ClearHandler(udb, adb, gdb);
-        res.status(200);
-        return "";
     }
 
     public String returnSerializedError(String message) {

@@ -33,8 +33,12 @@ public final class JoinGameRequest {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         var that = (JoinGameRequest) obj;
         return Objects.equals(this.playerColor, that.playerColor) &&
                 this.gameID == that.gameID &&

@@ -59,7 +59,8 @@ public class GameService {
             if (!Objects.equals(g.whiteUsername(), null)) {
                 throw new AlreadyTakenException();
             }
-        } else {
+        }
+        else {
             if (!Objects.equals(g.blackUsername(), null)) {
                 throw new AlreadyTakenException();
             }
