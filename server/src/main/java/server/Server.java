@@ -10,14 +10,17 @@ import spark.Spark;
 
 public class Server {
 
-    private static MemoryUserDAO udb;
+    private static SQLUserDAO udb;
     private static MemoryAuthDAO adb;
     private static MemoryGameDAO gdb;
 
     public Server() {
-        udb = new MemoryUserDAO();
-        adb = new MemoryAuthDAO();
-        gdb = new MemoryGameDAO();
+        try {
+            udb = new SQLUserDAO(); // This also initializes the Database
+            adb = new MemoryAuthDAO();
+            gdb = new MemoryGameDAO();
+        }
+        catch (DataAccessException ex){//}
     }
 
     public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
@@ -73,6 +76,14 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        try {
+            DatabaseManager dbm = new DatabaseManager();
+            dbm.getConnection();
+        }
+        catch (DataAccessException ex) {
+
+        }
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", Server::handleRegister);

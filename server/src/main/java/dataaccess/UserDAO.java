@@ -8,10 +8,6 @@ public interface UserDAO {
 
     UserData getUser(String username) throws DataAccessException;
 
-    boolean userExists(UserData u);
-
-    void clear();
-
-    void throwExIfInvalid(String username) throws DataAccessException;
+    void clear() throws DataAccessException;
 
 }
