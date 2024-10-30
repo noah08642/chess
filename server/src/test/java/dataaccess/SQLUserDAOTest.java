@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLUserDAOTest {
 
-    private MemoryUserDAO udb;
+    private SQLUserDAO udb;
 
     @BeforeEach
-    public void setUp() {
-        this.udb = new MemoryUserDAO();
+    public void setUp() throws DataAccessException {
+        this.udb = new SQLUserDAO();
     }
 
     @Test

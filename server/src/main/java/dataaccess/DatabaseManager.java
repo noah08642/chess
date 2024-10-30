@@ -9,9 +9,7 @@ public class DatabaseManager {
     private static final String PASSWORD;
     private static final String CONNECTION_URL;
 
-    /*
-     * Load the database information for the db.properties file.
-     */
+
 
     static final String[] createStatements = {
             """
@@ -25,10 +23,12 @@ public class DatabaseManager {
               INDEX(username),
               INDEX(password)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """,
-            """ 
             """
     };
+
+    /*
+     * Load the database information for the db.properties file.
+     */
 
     static {
         try {
@@ -45,6 +45,8 @@ public class DatabaseManager {
                 var host = props.getProperty("db.host");
                 var port = Integer.parseInt(props.getProperty("db.port"));
                 CONNECTION_URL = String.format("jdbc:mysql://%s:%d", host, port);
+
+                createDatabase();
 
                 try (var conn = DatabaseManager.getConnection()) {
                     for (var statement : createStatements) {
@@ -78,6 +80,7 @@ public class DatabaseManager {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 preparedStatement.executeUpdate();
             }
+            System.out.println("made database");
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -101,6 +104,7 @@ public class DatabaseManager {
             conn.setCatalog(DATABASE_NAME);
             return conn;
         } catch (SQLException e) {
+            System.out.println("about to throw exception");
             throw new DataAccessException(e.getMessage());
         }
     }
