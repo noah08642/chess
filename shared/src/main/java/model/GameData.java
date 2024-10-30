@@ -38,7 +38,10 @@ public final class GameData {
         else {
             whiteUsername = user;
         }
+    }
 
+    public ChessGame getGame() {
+        return game;
     }
 
     public String gameName() {

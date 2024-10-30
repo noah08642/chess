@@ -12,14 +12,9 @@ public interface GameDAO {
 
     GameData getGame(int gameID) throws DataAccessException;
 
-    boolean gameExists(int id);
+    List<GameData> listGames() throws DataAccessException;
 
-    List<GameData> listGames();
+    void clear() throws DataAccessException;
 
-    void clear();
-
-    void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user);
-
-    void throwExIfInvalid(int gameID) throws DataAccessException;
-}
+    void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) throws DataAccessException;}
 //(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game)
