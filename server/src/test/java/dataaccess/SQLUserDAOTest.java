@@ -13,6 +13,7 @@ public class SQLUserDAOTest {
     @BeforeEach
     public void setUp() throws DataAccessException {
         this.udb = new SQLUserDAO();
+        udb.clear();
     }
 
     @Test
@@ -30,5 +31,37 @@ public class SQLUserDAOTest {
 
         assertNotNull(u2);
         assertEquals(u1, u2);
+    }
+
+    @Test
+    public void insertGood() throws DataAccessException {
+        UserData u1 = new UserData("a", "b", "c");
+        udb.insertUser(u1);
+        assertNotNull(u1);
+    }
+
+    @Test
+    public void insertBad() throws DataAccessException {
+        UserData u1 = new UserData("a", "b", "c");
+        UserData u2 = new UserData("a", "b", "c");
+
+        udb.insertUser(u1);
+
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> udb.insertUser(u2));
+        assertEquals("Error: already taken", exception.getMessage());
+    }
+
+    @Test
+    public void clearGood() throws DataAccessException {
+        UserData u1 = new UserData("a", "b", "c");
+        UserData u2 = new UserData("d", "e", "f");
+
+        udb.insertUser(u1);
+        udb.insertUser(u2);
+
+        udb.clear();
+
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> udb.getUser("a"));
+        assertEquals("Error: unauthorized", exception.getMessage());
     }
 }
