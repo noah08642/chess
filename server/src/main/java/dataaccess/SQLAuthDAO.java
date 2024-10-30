@@ -1,25 +1,27 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+import model.AuthData;
 import model.UserData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class SQLUserDAO implements UserDAO {
+public class SQLAuthDAO implements AuthDAO {
 
-
-    public SQLUserDAO() throws DataAccessException {
+    public SQLAuthDAO() throws DataAccessException {
         DatabaseManager.createDatabase();
     }
 
-    public void insertUser(UserData u) throws DataAccessException {
-        // Check if a user with the given username already exists in the database
+    public void insertAuth(AuthData a) throws DataAccessException {
+        // Check if the authToken alreay exists
         try {
-            if (getUser(u.username()) != null) {
+            if (getAuth(a.authToken()) != null) {
                 throw new AlreadyTakenException();
             }
         }
@@ -28,21 +30,19 @@ public class SQLUserDAO implements UserDAO {
         }
 
         // Insert the new user into the database
-        var statement = "INSERT INTO user (username, password, email, json) VALUES (?, ?, ?, ?)";
-        var json = new Gson().toJson(u);
-        executeUpdate(statement, u.username(), u.password(), u.email(), json);
+        var statement = "INSERT INTO auth (authToken, username, json) VALUES (?, ?, ?)";
+        var json = new Gson().toJson(a);
+        executeUpdate(statement, a.authToken(), a.username(), json);
     }
 
-
-
-    public UserData getUser(String username) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM user WHERE username = ?";
+            var statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
+                ps.setString(1, authToken);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readUser(rs);  // Return the UserData object if found
+                        return readAuth(rs);  // Return the UserData object if found
                     } else {
                         throw new InvalidAuthException();
                     }
@@ -53,9 +53,30 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
+    public void deleteAuth(String authToken) throws DataAccessException {
+        // Check if the authToken alreay exists
+        try {
+            getAuth(authToken);
+        }
+        catch (InvalidAuthException e) {
+                throw e;
+        }
+
+        // Proceed to delete the auth token if it exists
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "DELETE FROM auth WHERE authToken = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                ps.executeUpdate(); // Execute update instead of query
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting auth token: " + e.getMessage());
+        }
+    }
+
 
     public void clear() throws DataAccessException {
-        var statement = "DELETE FROM user";
+        var statement = "DELETE FROM auth";
 
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement)) {
@@ -66,16 +87,11 @@ public class SQLUserDAO implements UserDAO {
         }
     }
 
-
-
-
-    private UserData readUser(ResultSet rs) throws SQLException {
+    private AuthData readAuth(ResultSet rs) throws SQLException {
+        var authToken = rs.getString("authToken");
         var username = rs.getString("username");
-        var password = rs.getString("password");
-        var email = rs.getString("email");
-        return new UserData(username, password, email);
+        return new AuthData(authToken, username);
     }
-
 
     private void executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -97,4 +113,7 @@ public class SQLUserDAO implements UserDAO {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
+
+
+
 }
