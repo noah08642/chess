@@ -40,6 +40,16 @@ public final class GameData {
         }
     }
 
+    public String getPlayerName(ChessGame.TeamColor color) {
+        if (color == ChessGame.TeamColor.WHITE) {
+            return whiteUsername;
+        } else if (color == ChessGame.TeamColor.BLACK) {
+            return blackUsername;
+        } else {
+            return null;
+        }
+    }
+
     public ChessGame getGame() {
         return game;
     }

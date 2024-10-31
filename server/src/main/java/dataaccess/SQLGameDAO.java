@@ -29,26 +29,26 @@ public class SQLGameDAO implements GameDAO {
     }
 
     private void throwExIfInvalid(int gameID) throws DataAccessException {
-        // Check if a user with the given username already exists in the database
+        // Check if a game is in the database already
         try {
             if (getGame(gameID) != null) {
                 throw new AlreadyTakenException();
             }
         }
         catch (InvalidAuthException e) {
-            // If `getUser` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
+            // If `getGame` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
         }
     }
 
 
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame FROM auth WHERE gameID = ?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame FROM game WHERE gameID = ?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readGame(rs);  // Return the UserData object if found
+                        return readGame(rs);  // Return the GameData object if found
                     } else {
                         throw new InvalidAuthException();
                     }
@@ -73,15 +73,25 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) throws DataAccessException {
-        throwExIfInvalid(gameID);
-        if (playerColor == ChessGame.TeamColor.WHITE) {
-            var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
-            executeUpdate(statement, user, gameID);
+        try {
+            throwExIfInvalid(gameID);
+            throw new InvalidAuthException();
         }
-        else {
-            var statement = "UPDATE game SET blackUsername = ? WHERE gameID = ?";
-            executeUpdate(statement, user, gameID);
+        catch(DataAccessException e) {
+            if ((playerColor== ChessGame.TeamColor.BLACK && (getGame(gameID).getPlayerName(ChessGame.TeamColor.BLACK) != null)) ||
+                    (playerColor== ChessGame.TeamColor.WHITE && (getGame(gameID).getPlayerName(ChessGame.TeamColor.WHITE) != null))) {
+                throw new AlreadyTakenException();
+            }
+            if (playerColor == ChessGame.TeamColor.WHITE) {
+                var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
+                executeUpdate(statement, user, gameID);
+            }
+            else {
+                var statement = "UPDATE game SET blackUsername = ? WHERE gameID = ?";
+                executeUpdate(statement, user, gameID);
+            }
         }
+
     }
 
     @Override
