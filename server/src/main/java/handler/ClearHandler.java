@@ -1,14 +1,12 @@
 package handler;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import service.Clear;
 
 public class ClearHandler {
 
 
-    public ClearHandler(MemoryUserDAO udb, MemoryAuthDAO adb, MemoryGameDAO gdb) {
+    public ClearHandler(SQLUserDAO udb, SQLAuthDAO adb, SQLGameDAO gdb) throws DataAccessException {
         Clear clear = new Clear(gdb, adb, udb);
         clear.clear();
     }

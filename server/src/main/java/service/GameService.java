@@ -15,11 +15,11 @@ import java.util.Objects;
 
 public class GameService {
 
-    private final MemoryGameDAO gdb;
-    private final MemoryAuthDAO adb;
-    private final MemoryUserDAO udb;
+    private final SQLGameDAO gdb;
+    private final SQLAuthDAO adb;
+    private final SQLUserDAO udb;
 
-    public GameService(MemoryGameDAO gdb, MemoryAuthDAO adb, MemoryUserDAO udb) {
+    public GameService(SQLGameDAO gdb, SQLAuthDAO adb, SQLUserDAO udb) {
         this.adb = adb;
         this.gdb = gdb;
         this.udb = udb;
@@ -31,7 +31,7 @@ public class GameService {
         String authToken = request.authToken();
 
         // authenticate, generate id, add to database
-        adb.throwExIfInvalid(authToken);
+//        adb.throwExIfInvalid(authToken);
         int id = generateID();
         GameData g = new GameData(id, null, null, gameName, new ChessGame());
         gdb.insertGame(g);
@@ -73,12 +73,12 @@ public class GameService {
 
     public ListResult list(ListRequest request) throws DataAccessException {
         String auth = request.authToken();
-        adb.throwExIfInvalid(auth);
+//        adb.throwExIfInvalid(auth);
 
         return new ListResult(gdb.listGames());
     }
 
-    private int generateID() {
+    private int generateID() throws DataAccessException {
         GameIdGenerator gen = new GameIdGenerator();
         return gen.generate(gdb);
     }

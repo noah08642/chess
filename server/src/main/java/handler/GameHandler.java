@@ -1,10 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import request.CreateGameRequest;
 import request.JoinGameRequest;
 import request.ListRequest;
@@ -17,7 +14,7 @@ public class GameHandler {
     spark.Request req;
     GameService gameService;
 
-    public GameHandler(spark.Request req, MemoryUserDAO udb, MemoryAuthDAO adb, MemoryGameDAO gdb) {
+    public GameHandler(spark.Request req, SQLUserDAO udb, SQLAuthDAO adb, SQLGameDAO gdb) {
         this.req = req;
         this.gameService = new GameService(gdb, adb, udb);
     }

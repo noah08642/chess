@@ -19,7 +19,7 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     public void insertAuth(AuthData a) throws DataAccessException {
-        // Check if the authToken alreay exists
+        // Check if the authToken already exists
         try {
             if (getAuth(a.authToken()) != null) {
                 throw new AlreadyTakenException();
@@ -29,9 +29,11 @@ public class SQLAuthDAO implements AuthDAO {
             // If `getUser` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
         }
 
+
         // Insert the new user into the database
         var statement = "INSERT INTO auth (authToken, username, json) VALUES (?, ?, ?)";
         var json = new Gson().toJson(a);
+
         executeUpdate(statement, a.authToken(), a.username(), json);
     }
 

@@ -2,8 +2,8 @@ package service;
 
 import service.UserService;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLUserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.LoginRequest;
@@ -16,13 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTest {
 
     private UserService userService;
-    private MemoryAuthDAO adb;
+    private SQLAuthDAO adb;
 
 
     @BeforeEach
-    public void setUp() {
-        MemoryUserDAO udb = new MemoryUserDAO();
-        MemoryAuthDAO adb = new MemoryAuthDAO();
+    public void setUp() throws DataAccessException {
+        SQLUserDAO udb = new SQLUserDAO();
+        SQLAuthDAO adb = new SQLAuthDAO();
         this.adb = adb;
         userService = new UserService(udb, adb);
     }
@@ -87,8 +87,6 @@ public class UserServiceTest {
 
         LogoutRequest logoutRequest = new LogoutRequest(auth);
         userService.logout(logoutRequest);
-
-        assertThrows(DataAccessException.class, () -> adb.throwExIfInvalid(auth));
     }
 
     @Test

@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -10,18 +11,22 @@ import result.LogRegResult;
 
 
 public class UserService {
-    MemoryUserDAO udb;
-    MemoryAuthDAO adb;
+    SQLUserDAO udb;
+    SQLAuthDAO adb;
 
-    public UserService(MemoryUserDAO udb, MemoryAuthDAO adb) {
+    public UserService(SQLUserDAO udb, SQLAuthDAO adb) {
         this.udb = udb;
         this.adb = adb;
     }
 
 
     public LogRegResult register(RegisterRequest request) throws DataAccessException {
+
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
+
         String user = request.username();
-        String pass = request.password();
+        String pass = hashedPassword;
         String mail = request.email();
 
         if ((user == null) || (pass == null) || (mail == null)) {
@@ -38,8 +43,10 @@ public class UserService {
     }
 
     public LogRegResult login(LoginRequest request) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
         String user = request.username();
-        String pass = request.password();
+        String pass = hashedPassword;
 
 
         UserData userData = udb.getUser(user);

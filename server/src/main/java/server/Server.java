@@ -11,18 +11,17 @@ import spark.Spark;
 public class Server {
 
     //private static SQLUserDAO udb;
-    private static MemoryUserDAO udb;
-    private static MemoryAuthDAO adb;
-    private static MemoryGameDAO gdb;
+    private static SQLUserDAO udb;
+    private static SQLAuthDAO adb;
+    private static SQLGameDAO gdb;
 
     public Server() {
-//        try {
-        //    udb = new SQLUserDAO(); // This also initializes the Database
-            udb = new MemoryUserDAO();
-            adb = new MemoryAuthDAO();
-            gdb = new MemoryGameDAO();
-//        }
-//       // catch (DataAccessException ex){}
+        try {
+            udb = new SQLUserDAO(); // This also initializes the Database
+            adb = new SQLAuthDAO();
+            gdb = new SQLGameDAO();
+        }
+        catch (DataAccessException ex){}
     }
 
     public static String handleRegister(spark.Request req, spark.Response res) throws DataAccessException {
@@ -68,7 +67,7 @@ public class Server {
         return res.body();
     }
 
-    public static String handleClear(spark.Request req, spark.Response res) {
+    public static String handleClear(spark.Request req, spark.Response res) throws DataAccessException {
         ClearHandler clearHandler = new ClearHandler(udb, adb, gdb);
         res.status(200);
         return "";

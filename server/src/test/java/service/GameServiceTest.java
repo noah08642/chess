@@ -4,9 +4,9 @@ import service.GameService;
 import service.UserService;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import request.CreateGameRequest;
@@ -27,9 +27,9 @@ public class GameServiceTest {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        MemoryUserDAO udb = new MemoryUserDAO();
-        MemoryAuthDAO adb = new MemoryAuthDAO();
-        MemoryGameDAO gdb = new MemoryGameDAO();
+        SQLUserDAO udb = new SQLUserDAO();
+        SQLAuthDAO adb = new SQLAuthDAO();
+        SQLGameDAO gdb = new SQLGameDAO();
         this.gameService = new GameService(gdb, adb, udb);
 
         UserService userService = new UserService(udb, adb);

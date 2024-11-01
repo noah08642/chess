@@ -148,4 +148,8 @@ public class SQLGameDAO implements GameDAO {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
+
+    protected boolean gameExists(int id) throws DataAccessException {
+        return getGame(id) != null;
+    }
 }

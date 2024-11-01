@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +31,9 @@ public class SQLUserDAO implements UserDAO {
         // Insert the new user into the database
         var statement = "INSERT INTO user (username, password, email, json) VALUES (?, ?, ?, ?)";
         var json = new Gson().toJson(u);
+
+        // hash password
+
         executeUpdate(statement, u.username(), u.password(), u.email(), json);
     }
 

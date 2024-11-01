@@ -3,9 +3,9 @@ package service;
 import service.Clear;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -18,9 +18,9 @@ public class ClearTest {
 
     @Test
     public void clearPositive() throws DataAccessException {
-        MemoryUserDAO udb = new MemoryUserDAO();
-        MemoryAuthDAO adb = new MemoryAuthDAO();
-        MemoryGameDAO gdb = new MemoryGameDAO();
+        SQLUserDAO udb = new SQLUserDAO();
+        SQLAuthDAO adb = new SQLAuthDAO();
+        SQLGameDAO gdb = new SQLGameDAO();
 
         udb.insertUser(new UserData("username", "password", "email"));
         adb.insertAuth(new AuthData("AuthToken", "username"));

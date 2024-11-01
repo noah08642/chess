@@ -2,8 +2,8 @@ package handler;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLUserDAO;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -15,7 +15,7 @@ public class UserHandler {
     spark.Request req;
     UserService userService;
 
-    public UserHandler(spark.Request req, MemoryUserDAO udb, MemoryAuthDAO adb) {
+    public UserHandler(spark.Request req, SQLUserDAO udb, SQLAuthDAO adb) {
         this.req = req;
         this.userService = new UserService(udb, adb);
     }
