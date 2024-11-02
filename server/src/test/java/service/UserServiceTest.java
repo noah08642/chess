@@ -25,6 +25,8 @@ public class UserServiceTest {
         SQLAuthDAO adb = new SQLAuthDAO();
         this.adb = adb;
         userService = new UserService(udb, adb);
+        udb.clear();
+        adb.clear();
     }
 
     @Test

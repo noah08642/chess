@@ -18,14 +18,8 @@ public class SQLUserDAO implements UserDAO {
     }
 
     public void insertUser(UserData u) throws DataAccessException {
-        // Check if a user with the given username already exists in the database
-        try {
-            if (getUser(u.username()) != null) {
-                throw new AlreadyTakenException();
-            }
-        }
-        catch (InvalidAuthException e) {
-            // If `getUser` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
+        if (userExists(u.username())) {
+            throw new AlreadyTakenException();
         }
 
         // Insert the new user into the database
@@ -33,7 +27,6 @@ public class SQLUserDAO implements UserDAO {
         var json = new Gson().toJson(u);
 
         // hash password
-
         executeUpdate(statement, u.username(), u.password(), u.email(), json);
     }
 
@@ -99,6 +92,20 @@ public class SQLUserDAO implements UserDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    private boolean userExists(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT 1 FROM user WHERE username = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error checking if user exists: " + e.getMessage());
         }
     }
 }

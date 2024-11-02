@@ -20,6 +20,8 @@ public class Server {
             udb = new SQLUserDAO(); // This also initializes the Database
             adb = new SQLAuthDAO();
             gdb = new SQLGameDAO();
+
+            udb.clear();
         }
         catch (DataAccessException ex){}
     }
