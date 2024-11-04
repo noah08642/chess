@@ -22,18 +22,17 @@ public class UserService {
 
     public LogRegResult register(RegisterRequest request) throws DataAccessException {
 
-        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
-
-
         String user = request.username();
-        String pass = hashedPassword;
+        String pass = request.password();
         String mail = request.email();
 
         if ((user == null) || (pass == null) || (mail == null)) {
             throw new BadRequestException();
         }
 
-        UserData userData = new UserData(user, pass, mail);
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
+        UserData userData = new UserData(user, hashedPassword, mail);
         udb.insertUser(userData);
 
         String authToken = returnAuth();
@@ -43,14 +42,12 @@ public class UserService {
     }
 
     public LogRegResult login(LoginRequest request) throws DataAccessException {
-        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+
 
         String user = request.username();
-        String pass = hashedPassword;
-
 
         UserData userData = udb.getUser(user);
-        if (!userData.password().equals(pass)) {
+        if (!BCrypt.checkpw(request.password(), userData.password())){
             throw new InvalidAuthException();
         }
 

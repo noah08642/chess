@@ -31,6 +31,9 @@ public class GameServiceTest {
         SQLAuthDAO adb = new SQLAuthDAO();
         SQLGameDAO gdb = new SQLGameDAO();
         this.gameService = new GameService(gdb, adb, udb);
+        udb.clear();
+        adb.clear();
+        gdb.clear();
 
         UserService userService = new UserService(udb, adb);
 

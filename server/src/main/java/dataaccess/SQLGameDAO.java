@@ -20,24 +20,14 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public void insertGame(GameData g) throws DataAccessException {
-        throwExIfInvalid(g.gameID());
+        if (gameExists(g.gameID())) {
+            throw new AlreadyTakenException();
+        }
 
         // Insert the new game into the database
         var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, jsonGame) VALUES (?, ?, ?, ?, ?)";
         var json = new Gson().toJson(g.getGame());
         executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), json);
-    }
-
-    private void throwExIfInvalid(int gameID) throws DataAccessException {
-        // Check if a game is in the database already
-        try {
-            if (getGame(gameID) != null) {
-                throw new AlreadyTakenException();
-            }
-        }
-        catch (InvalidAuthException e) {
-            // If `getGame` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
-        }
     }
 
 
@@ -73,25 +63,23 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public void addPlayer(ChessGame.TeamColor playerColor, int gameID, String user) throws DataAccessException {
-        try {
-            throwExIfInvalid(gameID);
+        if (!gameExists(gameID)) {
             throw new InvalidAuthException();
         }
-        catch(DataAccessException e) {
-            if ((playerColor== ChessGame.TeamColor.BLACK && (getGame(gameID).getPlayerName(ChessGame.TeamColor.BLACK) != null)) ||
-                    (playerColor== ChessGame.TeamColor.WHITE && (getGame(gameID).getPlayerName(ChessGame.TeamColor.WHITE) != null))) {
-                throw new AlreadyTakenException();
-            }
-            if (playerColor == ChessGame.TeamColor.WHITE) {
-                var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
-                executeUpdate(statement, user, gameID);
-            }
-            else {
-                var statement = "UPDATE game SET blackUsername = ? WHERE gameID = ?";
-                executeUpdate(statement, user, gameID);
-            }
+
+        if ((playerColor== ChessGame.TeamColor.BLACK && (getGame(gameID).getPlayerName(ChessGame.TeamColor.BLACK) != null)) ||
+                (playerColor== ChessGame.TeamColor.WHITE && (getGame(gameID).getPlayerName(ChessGame.TeamColor.WHITE) != null))) {
+            throw new AlreadyTakenException();
         }
 
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
+            executeUpdate(statement, user, gameID);
+        }
+        else {
+            var statement = "UPDATE game SET blackUsername = ? WHERE gameID = ?";
+            executeUpdate(statement, user, gameID);
+        }
     }
 
     @Override
@@ -149,7 +137,18 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    protected boolean gameExists(int id) throws DataAccessException {
-        return getGame(id) != null;
+
+    public boolean gameExists(int id) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT 1 FROM game WHERE gameID = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, id);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error checking if game exists: " + e.getMessage());
+        }
     }
 }

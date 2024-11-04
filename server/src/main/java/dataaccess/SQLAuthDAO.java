@@ -20,15 +20,9 @@ public class SQLAuthDAO implements AuthDAO {
 
     public void insertAuth(AuthData a) throws DataAccessException {
         // Check if the authToken already exists
-        try {
-            if (getAuth(a.authToken()) != null) {
-                throw new AlreadyTakenException();
-            }
+        if (authExists(a.authToken())) {
+            throw new AlreadyTakenException();
         }
-        catch (InvalidAuthException e) {
-            // If `getUser` throws `InvalidAuthException`, it means the user does not exist, so nothing to be done
-        }
-
 
         // Insert the new user into the database
         var statement = "INSERT INTO auth (authToken, username, json) VALUES (?, ?, ?)";
@@ -57,11 +51,8 @@ public class SQLAuthDAO implements AuthDAO {
 
     public void deleteAuth(String authToken) throws DataAccessException {
         // Check if the authToken alreay exists
-        try {
-            getAuth(authToken);
-        }
-        catch (InvalidAuthException e) {
-                throw e;
+        if (!authExists(authToken)) {
+            throw new InvalidAuthException();
         }
 
         // Proceed to delete the auth token if it exists
@@ -113,6 +104,20 @@ public class SQLAuthDAO implements AuthDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
+    }
+
+    public boolean authExists(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT 1 FROM auth WHERE authToken = ?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, authToken);
+                try (var rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Error checking if auth exists: " + e.getMessage());
         }
     }
 

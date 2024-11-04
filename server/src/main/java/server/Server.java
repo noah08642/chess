@@ -21,7 +21,6 @@ public class Server {
             adb = new SQLAuthDAO();
             gdb = new SQLGameDAO();
 
-            udb.clear();
         }
         catch (DataAccessException ex){}
     }

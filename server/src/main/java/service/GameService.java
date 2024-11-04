@@ -30,8 +30,10 @@ public class GameService {
         String gameName = request.gameName();
         String authToken = request.authToken();
 
-        // authenticate, generate id, add to database
-//        adb.throwExIfInvalid(authToken);
+        if (!adb.authExists(authToken)) {
+            throw new InvalidAuthException();
+        }
+
         int id = generateID();
         GameData g = new GameData(id, null, null, gameName, new ChessGame());
         gdb.insertGame(g);
@@ -48,6 +50,10 @@ public class GameService {
         AuthData a = adb.getAuth(auth);
         String user = a.username();
         UserData u = udb.getUser(user);
+
+        if (!gdb.gameExists(id)) {
+            throw new BadRequestException();
+        }
 
         GameData g = gdb.getGame(id);
 
@@ -73,7 +79,10 @@ public class GameService {
 
     public ListResult list(ListRequest request) throws DataAccessException {
         String auth = request.authToken();
-//        adb.throwExIfInvalid(auth);
+
+        if (!adb.authExists(auth)) {
+            throw new InvalidAuthException();
+        }
 
         return new ListResult(gdb.listGames());
     }
