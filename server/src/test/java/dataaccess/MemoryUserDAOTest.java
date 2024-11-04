@@ -1,5 +1,6 @@
 package dataaccess;
 
+import memorydao.MemoryUserDAO;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
