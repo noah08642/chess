@@ -27,7 +27,7 @@ public class SQLGameDAO implements GameDAO {
         // Insert the new game into the database
         var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, jsonGame) VALUES (?, ?, ?, ?, ?)";
         var json = new Gson().toJson(g.getGame());
-        executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), json);
+        DatabaseManager.executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), json);
     }
 
 
@@ -74,11 +74,11 @@ public class SQLGameDAO implements GameDAO {
 
         if (playerColor == ChessGame.TeamColor.WHITE) {
             var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
-            executeUpdate(statement, user, gameID);
+            DatabaseManager.executeUpdate(statement, user, gameID);
         }
         else {
             var statement = "UPDATE game SET blackUsername = ? WHERE gameID = ?";
-            executeUpdate(statement, user, gameID);
+            DatabaseManager.executeUpdate(statement, user, gameID);
         }
     }
 
@@ -116,26 +116,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
 
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
 
 
     public boolean gameExists(int id) throws DataAccessException {
@@ -151,4 +132,5 @@ public class SQLGameDAO implements GameDAO {
             throw new DataAccessException("Error checking if game exists: " + e.getMessage());
         }
     }
+    
 }

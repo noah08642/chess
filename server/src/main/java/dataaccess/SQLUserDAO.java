@@ -27,7 +27,7 @@ public class SQLUserDAO implements UserDAO {
         var json = new Gson().toJson(u);
 
         // hash password
-        executeUpdate(statement, u.username(), u.password(), u.email(), json);
+        DatabaseManager.executeUpdate(statement, u.username(), u.password(), u.email(), json);
     }
 
 
@@ -73,27 +73,6 @@ public class SQLUserDAO implements UserDAO {
         return new UserData(username, password, email);
     }
 
-
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    rs.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
 
     private boolean userExists(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {

@@ -79,14 +79,6 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-//        try {
-//            DatabaseManager dbm = new DatabaseManager();
-//            dbm.getConnection();
-//        }
-//        catch (DataAccessException ex) {
-//
-//        }
-
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", Server::handleRegister);
         Spark.post("/session", Server::handleLogin);

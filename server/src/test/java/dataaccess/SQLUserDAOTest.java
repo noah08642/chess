@@ -25,9 +25,9 @@ public class SQLUserDAOTest {
 
     @Test
     public void getExistingUser() throws DataAccessException {
-        UserData u1 = new UserData("a", "b", "c");
+        UserData u1 = new UserData("alpha", "beta", "charly");
         udb.insertUser(u1);
-        UserData u2 = udb.getUser("a");
+        UserData u2 = udb.getUser("alpha");
 
         assertNotNull(u2);
         assertEquals(u1, u2);
