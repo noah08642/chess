@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class ChessPiece {
 
+    public static ChessPiece.PieceType PieceType;
     private final ChessGame.TeamColor teamColor;
     private final ChessPiece.PieceType pieceType;
 
