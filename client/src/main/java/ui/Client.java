@@ -15,8 +15,8 @@ public class Client {
     public static void main(String[] args) {
         ChessBoard board = new ChessBoard();
         board.resetBoard();
-        BoardPrinter printer = new BoardPrinter(ChessGame.TeamColor.BLACK, board.getBoard());
-        printer.print();
+        BoardPrinter printer = new BoardPrinter();
+        printer.print(ChessGame.TeamColor.WHITE, board.getBoard());
     }
     // this does all the output for menu stuff.  and it calls the BoardPrinter...
 

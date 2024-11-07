@@ -11,20 +11,23 @@ import java.util.List;
 import static ui.EscapeSequences.*;
 
 public class BoardPrinter {
-    private final ChessGame.TeamColor color;
-    private final ChessPiece[][] board;
+    private  ChessGame.TeamColor color;
+    private  ChessPiece[][] board;
     private final PrintStream out;
     private final List<String> LETTERS = Arrays.asList(null, "a", "b", "c", "d", "e", "f", "g", "h", null);
     private final List<String> BLACK = Arrays.asList("k","r","p","b","n","q");
 
 
-    public BoardPrinter(ChessGame.TeamColor color, ChessPiece[][] board) {
-        this.color = color;
-        this.board = board;
+    public BoardPrinter() {
+        this.color = null;
+        this.board = null;
         this.out = new PrintStream(System.out, true, StandardCharsets.UTF_8); // Initialize 'out'
     }
 
-    public void print() {
+    public void print(ChessGame.TeamColor color, ChessPiece[][] board) {
+        this.color = color;
+        this.board = board;
+
         out.print(ERASE_SCREEN);
         drawBoard();
         out.print(SET_BG_COLOR_BLACK);
