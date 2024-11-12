@@ -1,11 +1,16 @@
 package network;
 
 import com.google.gson.Gson;
+import model.GameData;
+import request.CreateGameRequest;
+import request.ListRequest;
 import request.LoginRequest;
 import request.RegisterRequest;
+import result.ListResult;
 import result.LogRegResult;
 
 import java.io.IOException;
+import java.util.List;
 
 public class ServerFacade {
     ClientCommunicator communicator;
@@ -16,14 +21,14 @@ public class ServerFacade {
         this.url = serverURL;
     }
 
-    public void login(LoginRequest request) throws IOException {
+    public LogRegResult login(LoginRequest request) throws IOException {
         String jsonResult = communicator.doPost(url + "/session", serialize(request), null);
-        LogRegResult objResult= deserialize(jsonResult, LogRegResult.class);
+        return deserialize(jsonResult, LogRegResult.class);
     }
 
-    public void register(RegisterRequest request) throws IOException {
+    public LogRegResult register(RegisterRequest request) throws IOException {
         String jsonResult = communicator.doPost(url + "/user", serialize(request), null);
-        LogRegResult objResult= deserialize(jsonResult, LogRegResult.class);
+        return deserialize(jsonResult, LogRegResult.class);
     }
 
     private String serialize(Object object) {
@@ -35,6 +40,18 @@ public class ServerFacade {
         var deserializer = new Gson();
         return deserializer.fromJson(json, clazz);
     }
+
+    public List<GameData> listGames(ListRequest request) throws IOException {
+        String jsonResult = communicator.doGet(url + "/game", request.authToken());
+        ListResult resultObj = deserialize(jsonResult, ListResult.class);
+        return resultObj.games();
+    }
+
+    public void createGame(CreateGameRequest request) throws IOException {
+        communicator.doPost(url + "/game", serialize(request), request.authToken());
+    }
+
+    public void
 
 
 //
