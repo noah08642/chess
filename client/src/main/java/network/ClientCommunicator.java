@@ -1,8 +1,5 @@
 package network;
 
-import request.LoginRequest;
-import result.LogRegResult;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,8 +16,12 @@ public class ClientCommunicator {
         connection.setReadTimeout(5000);
         connection.setRequestMethod("GET");
 
+        return getNoBodyServerResult(header, connection);
+    }
+
+    private String getNoBodyServerResult(String header, HttpURLConnection connection) throws IOException {
         //Write header if they're authorized
-        if(header!=null) {
+        if(header !=null) {
             connection.addRequestProperty("Authorization", header);
         }
 
@@ -44,10 +45,10 @@ public class ClientCommunicator {
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-        return getServerResult(jsonBody, header, connection);
+        return getBodyServerResult(jsonBody, header, connection);
     }
 
-    private String getServerResult(String jsonBody, String header, HttpURLConnection connection) throws IOException {
+    private String getBodyServerResult(String jsonBody, String header, HttpURLConnection connection) throws IOException {
         //Write header if they're authorized
         if(header !=null) {
             connection.addRequestProperty("Authorization", header);
@@ -80,7 +81,18 @@ public class ClientCommunicator {
         connection.setDoOutput(true);
 
         //Write header if they're authorized
-        return getServerResult(jsonBody, header, connection);
+        return getBodyServerResult(jsonBody, header, connection);
+    }
+
+    public String doDelete(String urlString, String jsonBody, String header) throws IOException {
+        URL url = new URL(urlString);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setReadTimeout(5000);
+        connection.setRequestMethod("Delete");
+
+        return getNoBodyServerResult(header, connection);
     }
 
     // Helper method to read InputStream and return it as a String

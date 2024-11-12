@@ -7,10 +7,7 @@ import java.util.Scanner;
 import chess.ChessGame;
 import model.GameData;
 import network.ServerFacade;
-import request.CreateGameRequest;
-import request.ListRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import request.*;
 import result.LogRegResult;
 
 
@@ -150,7 +147,11 @@ public class Client {
         if(input ==1) {teamColor = ChessGame.TeamColor.WHITE;}
         else { teamColor = ChessGame.TeamColor.BLACK;}
 
-
+        try {
+            server.joinGame(new JoinGameRequest(teamColor, id, authToken));
+        } catch (Exception e){
+            System.out.println("unable to join game: " + e.getMessage());
+        }
     }
 
 

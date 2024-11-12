@@ -2,10 +2,7 @@ package network;
 
 import com.google.gson.Gson;
 import model.GameData;
-import request.CreateGameRequest;
-import request.ListRequest;
-import request.LoginRequest;
-import request.RegisterRequest;
+import request.*;
 import result.ListResult;
 import result.LogRegResult;
 
@@ -51,7 +48,9 @@ public class ServerFacade {
         communicator.doPost(url + "/game", serialize(request), request.authToken());
     }
 
-    public void
+    public void joinGame(JoinGameRequest request) throws IOException {
+        communicator.doPut(url + "/game", serialize(request), request.authToken());
+    }
 
 
 //
