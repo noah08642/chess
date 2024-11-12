@@ -84,7 +84,7 @@ public class ClientCommunicator {
         return getBodyServerResult(jsonBody, header, connection);
     }
 
-    public String doDelete(String urlString, String jsonBody, String header) throws IOException {
+    public String doDelete(String urlString, String header) throws IOException {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();

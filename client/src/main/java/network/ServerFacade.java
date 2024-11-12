@@ -52,6 +52,10 @@ public class ServerFacade {
         communicator.doPut(url + "/game", serialize(request), request.authToken());
     }
 
+    public void logout(LogoutRequest request) throws IOException {
+        communicator.doDelete(url + "/session",  request.authToken());
+    }
+
 
 //
 //    public LogRegResult logout(LogoutRequest request) {

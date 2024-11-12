@@ -14,13 +14,13 @@ import result.LogRegResult;
 public class Client {
     ServerFacade server;
     private final String serverUrl;
-    private State state = State.SIGNEDOUT;
     private String authToken;
     private List<GameData> gameList;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        authToken = null;
     }
 
     // update this..
@@ -32,7 +32,7 @@ public class Client {
             if (input == 0) {
                 return false;
             }
-            if (state==State.SIGNEDOUT) {
+            if (authToken!=null) {
                 switch (input) {
                     case 1 -> login();
                     case 2 -> register();
@@ -41,10 +41,10 @@ public class Client {
             }
             else {
                 switch (input) {
-//                    case 1 -> logout();
+                    case 1 -> logout();
                     case 2 -> createGame();
                     case 3 -> listGames();
-//                    case 4 -> joinGame();
+                    case 4 -> joinGame();
 //                    case 5 -> observeGame();
                 };
             }
@@ -64,8 +64,6 @@ public class Client {
             LoginRequest request = new LoginRequest(user, pass);
             LogRegResult result = server.login(request);
             authToken = result.authToken();
-            state = State.SIGNEDIN;
-            menu();
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -83,8 +81,6 @@ public class Client {
             RegisterRequest request = new RegisterRequest(user, pass, email);
             LogRegResult result = server.register(request);
             authToken = result.authToken();
-            state = State.SIGNEDIN;
-            menu();
         }
         catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -101,7 +97,14 @@ public class Client {
             else {
                 System.out.println("\nGames: ");
                 for(int i = 0; i < gameList.size(); ++i) {
-                    System.out.println(" " + i + " " + gameList.get(i).gameName());
+                    GameData game = gameList.get(i);
+                    System.out.println(" " + i + 1 + " " + game.gameName());
+
+                    String blackName = (game.blackUsername()==null) ? "Available" : game.blackUsername();
+                    String whiteName = (game.whiteUsername()==null) ? "Available" : game.whiteUsername();
+
+                    System.out.print("   - " + blackName);
+                    System.out.print("   - " + whiteName);
                 }
             }
         } catch(IOException e) {
@@ -120,32 +123,56 @@ public class Client {
         }
     }
 
-    public void joinGame() {
+    private GameData gameSelector() {
         listGames();
-        if(gameList.isEmpty()) {
+        if (gameList.isEmpty()) {
             System.out.println("No available games.  Create a game and come back.");
-            return;
+            return null;
         }
 
         System.out.println("Enter a number to select a game");
-        int input = getInt();
-        while (input > gameList.size()) {
+        int input = getInt() - 1;
+        if (input >= gameList.size()) {
             System.out.println("Game does not exist, select another game");
-            input = getInt();
+            return gameSelector();
         }
-        int id = gameList.get(input).gameID();
+        GameData game = gameList.get(input);
+        if (game.blackUsername()!= null && game.whiteUsername()!=null) {
+            System.out.print("Not available to join.  Select another game. \n");
+            return gameSelector();
+        }
+        return game;
+    }
 
-
+    private ChessGame.TeamColor colorSelector(GameData game) {
         System.out.println("Enter a number to select a color");
         System.out.print("\n1 WHITE \n2 BLACK\n");
-        input = getInt();
-        while (input != 1 && input != 0) {
-            System.out.print("\n Gosh dangit select a given number\n1 WHITE \n2 BLACK\n");
-            input = getInt();
+        int input = getInt();
+        if (input != 1 && input != 0) {
+            System.out.print("\n Invalid\n");
+            colorSelector(game);
         }
-        ChessGame.TeamColor teamColor;
-        if(input ==1) {teamColor = ChessGame.TeamColor.WHITE;}
-        else { teamColor = ChessGame.TeamColor.BLACK;}
+        String choice = (input == 0) ? game.blackUsername() : game.whiteUsername();
+        if (choice == null) {
+            System.out.print("\n Invalid\n");
+            colorSelector(game);
+        }
+        ChessGame.TeamColor teamColor = (input == 0) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        return teamColor;
+    }
+
+    public void joinGame() {
+
+        GameData game = gameSelector();
+
+        if (game==null) {
+            System.out.println("No available games.  Create one and then come back.");
+            return;
+        }
+
+        int id = game.gameID();
+
+        ChessGame.TeamColor teamColor = colorSelector(game);
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
@@ -153,6 +180,22 @@ public class Client {
             System.out.println("unable to join game: " + e.getMessage());
         }
     }
+
+    public void logout() {
+        try {
+            server.logout(new LogoutRequest(authToken));
+        } catch (Exception e){
+            System.out.println("unable to logout: " + e.getMessage());
+        }
+    }
+
+    public void observe() {
+        listGames();
+        GameData game = gameSelector();
+        System.out.print(game.toString());
+    }
+
+
 
 
     private String getInput() {
@@ -167,7 +210,7 @@ public class Client {
 
 
     public String menu() {
-        if (state == State.SIGNEDOUT) {
+        if (authToken != null) {
             return """
                     Enter a number to select:
                     
