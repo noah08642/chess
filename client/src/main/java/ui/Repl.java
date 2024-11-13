@@ -21,9 +21,6 @@ public class Repl {
             choice = scanner.nextInt();
             isNotQuit = client.eval(choice);
         }
-
-
-
         System.out.println();
     }
 }
