@@ -85,27 +85,13 @@ public class BoardPrinter {
 
         if(color == ChessGame.TeamColor.WHITE) {
             for (int col = 0; col < 8; ++col) {
-                ChessPiece piece = board[8 - row][col];
-                String letter = (piece == null) ? null : piece.toString();
-
-                if (col % 2 == 0) {
-                    drawWhiteSquare(letter);
-                } else {
-                    drawBlackSquare(letter);
-                }
+                drawAppropriateSquareWhiteRow(row, col);
             }
         }
 
         else {
             for (int col = 7; col >= 0; --col) {
-                ChessPiece piece = board[8 - row][col];
-                String letter = (piece == null) ? null : piece.toString();
-
-                if (col % 2 == 0) {
-                    drawWhiteSquare(letter);
-                } else {
-                    drawBlackSquare(letter);
-                }
+                drawAppropriateSquareWhiteRow(row, col);
             }
         }
 
@@ -114,38 +100,46 @@ public class BoardPrinter {
         out.println();
     }
 
+    private void drawAppropriateSquareWhiteRow(int row, int col) {
+        ChessPiece piece = board[8 - row][col];
+        String letter = (piece == null) ? null : piece.toString();
+
+        if (col % 2 == 0) {
+            drawWhiteSquare(letter);
+        } else {
+            drawBlackSquare(letter);
+        }
+    }
+
     private void drawBlackRow(int row) {
         printEdge(String.valueOf(9 - row));
 
         if (color == ChessGame.TeamColor.WHITE) {
             for (int col = 0; col < 8; ++col) {
-                ChessPiece piece = board[8 - row][col];
-                String letter = (piece == null) ? null : piece.toString();
-
-                if (col % 2 == 0) {
-                    drawBlackSquare(letter);
-                } else {
-                    drawWhiteSquare(letter);
-                }
+                drawAppropriateSquareBlackRow(row, col);
             }
         }
 
         else {
             for (int col = 7; col >=0; --col) {
-                ChessPiece piece = board[8 - row][col];
-                String letter = (piece == null) ? null : piece.toString();
-
-                if (col % 2 == 0) {
-                    drawBlackSquare(letter);
-                } else {
-                    drawWhiteSquare(letter);
-                }
+                drawAppropriateSquareBlackRow(row, col);
             }
         }
 
         printEdge(String.valueOf(9 - row));
         out.print(RESET_BG_COLOR);
         out.println();
+    }
+
+    private void drawAppropriateSquareBlackRow(int row, int col) {
+        ChessPiece piece = board[8 - row][col];
+        String letter = (piece == null) ? null : piece.toString();
+
+        if (col % 2 == 0) {
+            drawBlackSquare(letter);
+        } else {
+            drawWhiteSquare(letter);
+        }
     }
 
     private void drawWhiteSquare(String letter) {
