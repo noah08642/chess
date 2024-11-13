@@ -129,5 +129,8 @@ public class Server {
         return serializer.toJson(result);
     }
 
+    public SQLGameDAO returnGameDAO() {
+        return gdb;
+    }
 
 }

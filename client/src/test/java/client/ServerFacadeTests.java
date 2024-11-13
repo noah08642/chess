@@ -39,9 +39,9 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register_invalidData() {
-
-        assertThrows(Exception.class, () -> facade.register(new RegisterRequest("", "", "")));
+    void register_invalidData() throws Exception {
+        LogRegResult result = facade.register(new RegisterRequest("lol", "lol", "lol"));
+        assertThrows(Exception.class, () -> facade.register(new RegisterRequest("lol", "lol", "lol")));
     }
 
     // Positive and Negative test cases for login()
@@ -53,23 +53,23 @@ public class ServerFacadeTests {
 
     @Test
     void login_invalidCredentials() {
-        assertThrows(IOException.class, () -> facade.login(new LoginRequest("bad", "bad")));
+        assertThrows(Exception.class, () -> facade.login(new LoginRequest("bad", "bad")));
     }
 
     // Positive and Negative test cases for listGames()
     @Test
     void listGames_validToken() throws Exception {
-        LogRegResult result = facade.login(new LoginRequest("player1", "password"));
+        LogRegResult result = facade.register(new RegisterRequest("z","z","z"));
         String auth = result.authToken();
         facade.createGame(new CreateGameRequest("gamey", auth));
-        var request = new ListRequest("validAuthToken");
+        var request = new ListRequest(auth);
         List<GameData> games = facade.listGames(request);
         assertNotNull(games);
     }
 
     @Test
     void listGames_invalidToken() throws Exception {
-        LogRegResult result = facade.login(new LoginRequest("player1", "password"));
+        LogRegResult result = facade.register(new RegisterRequest("y","y","y"));
         String auth = result.authToken();
         facade.createGame(new CreateGameRequest("gamey2", auth));
 
@@ -79,7 +79,8 @@ public class ServerFacadeTests {
     // Positive and Negative test cases for createGame()
     @Test
     void createGame_validData() throws Exception {
-        var request = new CreateGameRequest("New Game", "validAuthToken");
+        LogRegResult result = facade.register(new RegisterRequest("g", "h", "i"));
+        var request = new CreateGameRequest("New Game", result.authToken());
         facade.createGame(request);
         assertTrue(true); // Success if no exception is thrown
     }
@@ -92,21 +93,27 @@ public class ServerFacadeTests {
     // Positive and Negative test cases for joinGame()
     @Test
     void joinGame_validData() throws Exception {
-        var request = new JoinGameRequest(ChessGame.TeamColor.WHITE, 123, "validAuthToken");
+        LogRegResult a = facade.register(new RegisterRequest("j", "k", "l"));
+        facade.clear(a.authToken());
+        LogRegResult result = facade.register(new RegisterRequest("j", "k", "l"));
+        facade.createGame(new CreateGameRequest("gammmmme", result.authToken()));
+        int id = server.returnGameDAO().listGames().getFirst().gameID();
+        var request = new JoinGameRequest(ChessGame.TeamColor.WHITE, id, result.authToken());
         facade.joinGame(request);
         assertTrue(true); // Success if no exception is thrown
     }
 
     @Test
-    void joinGame_invalidGameID() throws Exception {
-        LogRegResult result  = facade.login(new LoginRequest("player1", "password"));
+    void joinGame_invalidAuth() throws Exception {
+        LogRegResult result = facade.register(new RegisterRequest("m", "m", "m"));
         assertThrows(Exception.class, () -> facade.joinGame(new JoinGameRequest(ChessGame.TeamColor.WHITE, -1, result.authToken())));
     }
 
     // Positive and Negative test cases for logout()
     @Test
     void logout_validToken() throws Exception {
-        var request = new LogoutRequest("validAuthToken");
+        LogRegResult result = facade.register(new RegisterRequest("o", "o", "o"));
+        var request = new LogoutRequest(result.authToken());
         facade.logout(request);
         assertTrue(true); // Success if no exception is thrown
     }
