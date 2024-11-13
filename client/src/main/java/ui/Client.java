@@ -32,11 +32,11 @@ public class Client {
             if (input == 0) {
                 return false;
             }
-            if (authToken!=null) {
+            if (authToken==null) {
                 switch (input) {
                     case 1 -> login();
                     case 2 -> register();
-//                    case 3 -> help();
+                    case 3 -> help();
                 };
             }
             else {
@@ -45,7 +45,7 @@ public class Client {
                     case 2 -> createGame();
                     case 3 -> listGames();
                     case 4 -> joinGame();
-//                    case 5 -> observeGame();
+                    case 5 -> observe();
                 };
             }
 
@@ -53,6 +53,10 @@ public class Client {
             System.out.println(ex.getMessage());
         }
         return true;
+    }
+
+    private void help() {
+        System.out.println("Enter 0 to quit, enter 1 to login, enter 2 to register, or enter 3 to see this again.");
     }
 
     public void login() {
@@ -98,16 +102,16 @@ public class Client {
                 System.out.println("\nGames: ");
                 for(int i = 0; i < gameList.size(); ++i) {
                     GameData game = gameList.get(i);
-                    System.out.println(" " + i + 1 + " " + game.gameName());
+                    System.out.println(" " + (i + 1) + " " + game.gameName());
 
                     String blackName = (game.blackUsername()==null) ? "Available" : game.blackUsername();
                     String whiteName = (game.whiteUsername()==null) ? "Available" : game.whiteUsername();
 
-                    System.out.print("   - " + blackName);
-                    System.out.print("   - " + whiteName);
+                    System.out.println("   - Black: " + blackName);
+                    System.out.println("   - White: " + whiteName);
                 }
             }
-        } catch(IOException e) {
+        } catch(Exception e) {
             System.out.println("error in listing games (could be bad authToken");
         }
     }
@@ -148,13 +152,13 @@ public class Client {
         System.out.println("Enter a number to select a color");
         System.out.print("\n1 WHITE \n2 BLACK\n");
         int input = getInt();
-        if (input != 1 && input != 0) {
+        if (input != 1 && input != 2) {
             System.out.print("\n Invalid\n");
             colorSelector(game);
         }
-        String choice = (input == 0) ? game.blackUsername() : game.whiteUsername();
-        if (choice == null) {
-            System.out.print("\n Invalid\n");
+        String choice = (input == 2) ? game.blackUsername() : game.whiteUsername();
+        if (choice != null) {
+            System.out.print("\n Taken\n");
             colorSelector(game);
         }
         ChessGame.TeamColor teamColor = (input == 0) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
@@ -184,6 +188,7 @@ public class Client {
     public void logout() {
         try {
             server.logout(new LogoutRequest(authToken));
+            authToken = null;
         } catch (Exception e){
             System.out.println("unable to logout: " + e.getMessage());
         }
@@ -210,7 +215,7 @@ public class Client {
 
 
     public String menu() {
-        if (authToken != null) {
+        if (authToken == null) {
             return """
                     Enter a number to select:
                     
@@ -233,14 +238,4 @@ public class Client {
                 """;
         }
     }
-
-
-
-
-    // this does all the output for menu stuff.  and it calls the BoardPrinter...
-
-    // it should have multiple levels of menus...
-
-    // you need to keep track of whether they're signed in or not.
-    // the easiest way is to check if authToken is null.  If it is, send them the non-logged-in menu.
 }

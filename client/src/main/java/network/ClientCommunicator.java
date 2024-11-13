@@ -8,7 +8,7 @@ public class ClientCommunicator {
 
 
 
-    public String doGet(String urlString, String header) throws IOException {
+    public String doGet(String urlString, String header) throws Exception {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -19,7 +19,7 @@ public class ClientCommunicator {
         return getNoBodyServerResult(header, connection);
     }
 
-    private String getNoBodyServerResult(String header, HttpURLConnection connection) throws IOException {
+    private String getNoBodyServerResult(String header, HttpURLConnection connection) throws Exception {
         //Write header if they're authorized
         if(header !=null) {
             connection.addRequestProperty("Authorization", header);
@@ -32,11 +32,11 @@ public class ClientCommunicator {
             return readInputStream(responseBody);
         } else {
             InputStream responseBody = connection.getErrorStream();
-            return readInputStream(responseBody);
+            throw new Exception(readInputStream(responseBody));
         }
     }
 
-    public String doPost(String urlString, String jsonBody, String header) throws IOException {
+    public String doPost(String urlString, String jsonBody, String header) throws Exception {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -48,7 +48,7 @@ public class ClientCommunicator {
         return getBodyServerResult(jsonBody, header, connection);
     }
 
-    private String getBodyServerResult(String jsonBody, String header, HttpURLConnection connection) throws IOException {
+    private String getBodyServerResult(String jsonBody, String header, HttpURLConnection connection) throws Exception {
         //Write header if they're authorized
         if(header !=null) {
             connection.addRequestProperty("Authorization", header);
@@ -67,30 +67,30 @@ public class ClientCommunicator {
             return readInputStream(responseBody);
         } else {
             InputStream responseBody = connection.getErrorStream();
-            return readInputStream(responseBody);
+            throw new Exception(readInputStream(responseBody));
         }
     }
 
-    public String doPut(String urlString, String jsonBody, String header) throws IOException {
+    public String doPut(String urlString, String jsonBody, String header) throws Exception {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setReadTimeout(5000);
-        connection.setRequestMethod("Put");
+        connection.setRequestMethod("PUT");
         connection.setDoOutput(true);
 
         //Write header if they're authorized
         return getBodyServerResult(jsonBody, header, connection);
     }
 
-    public String doDelete(String urlString, String header) throws IOException {
+    public String doDelete(String urlString, String header) throws Exception {
         URL url = new URL(urlString);
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         connection.setReadTimeout(5000);
-        connection.setRequestMethod("Delete");
+        connection.setRequestMethod("DELETE");
 
         return getNoBodyServerResult(header, connection);
     }

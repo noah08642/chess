@@ -18,12 +18,12 @@ public class ServerFacade {
         this.url = serverURL;
     }
 
-    public LogRegResult login(LoginRequest request) throws IOException {
+    public LogRegResult login(LoginRequest request) throws Exception {
         String jsonResult = communicator.doPost(url + "/session", serialize(request), null);
         return deserialize(jsonResult, LogRegResult.class);
     }
 
-    public LogRegResult register(RegisterRequest request) throws IOException {
+    public LogRegResult register(RegisterRequest request) throws Exception {
         String jsonResult = communicator.doPost(url + "/user", serialize(request), null);
         return deserialize(jsonResult, LogRegResult.class);
     }
@@ -38,31 +38,26 @@ public class ServerFacade {
         return deserializer.fromJson(json, clazz);
     }
 
-    public List<GameData> listGames(ListRequest request) throws IOException {
+    public List<GameData> listGames(ListRequest request) throws Exception {
         String jsonResult = communicator.doGet(url + "/game", request.authToken());
         ListResult resultObj = deserialize(jsonResult, ListResult.class);
         return resultObj.games();
     }
 
-    public void createGame(CreateGameRequest request) throws IOException {
+    public void createGame(CreateGameRequest request) throws Exception {
         communicator.doPost(url + "/game", serialize(request), request.authToken());
     }
 
-    public void joinGame(JoinGameRequest request) throws IOException {
+    public void joinGame(JoinGameRequest request) throws Exception {
         communicator.doPut(url + "/game", serialize(request), request.authToken());
     }
 
-    public void logout(LogoutRequest request) throws IOException {
+    public void logout(LogoutRequest request) throws Exception {
         communicator.doDelete(url + "/session",  request.authToken());
     }
 
-
-//
-//    public LogRegResult logout(LogoutRequest request) {
-//
-//    }
-//
-//    public
-
+    public void clear(String auth) throws Exception {
+        communicator.doDelete(url + "/db", auth);
+    }
 
 }
