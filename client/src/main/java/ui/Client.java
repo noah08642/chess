@@ -46,6 +46,7 @@ public class Client {
                     case 3 -> listGames();
                     case 4 -> joinGame();
                     case 5 -> observe();
+                    case 6 -> help2();
                 };
             }
 
@@ -59,6 +60,10 @@ public class Client {
         System.out.println("Enter 0 to quit, enter 1 to login, enter 2 to register, or enter 3 to see this again.");
     }
 
+    private void help2() {
+        System.out.println("Enter 1 to logout, 2 to create game, 3 to list games, 4 to join a game, 5 ot observe, and 6 to see this menu again.");
+    }
+
     public void login() {
         try {
             System.out.println("Enter username: ");
@@ -70,7 +75,8 @@ public class Client {
             authToken = result.authToken();
         }
         catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            //System.out.println(ex.getMessage());
+            System.out.println("Unauthorized");
         }
     }
 
@@ -87,7 +93,8 @@ public class Client {
             authToken = result.authToken();
         }
         catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            //System.out.println(ex.getMessage());
+            System.out.println("Invalid");
         }
     }
 
@@ -104,15 +111,16 @@ public class Client {
                     GameData game = gameList.get(i);
                     System.out.println(" " + (i + 1) + " " + game.gameName());
 
-                    String blackName = (game.blackUsername()==null) ? "Available" : game.blackUsername();
                     String whiteName = (game.whiteUsername()==null) ? "Available" : game.whiteUsername();
+                    String blackName = (game.blackUsername()==null) ? "Available" : game.blackUsername();
 
-                    System.out.println("   - Black: " + blackName);
                     System.out.println("   - White: " + whiteName);
+                    System.out.println("   - Black: " + blackName);
+
                 }
             }
         } catch(Exception e) {
-            System.out.println("error in listing games (could be bad authToken");
+            System.out.println("error in listing games (could be bad authToken)");
         }
     }
 
@@ -123,8 +131,8 @@ public class Client {
         try {
             server.createGame(request);
         } catch(Exception e) {
-            System.out.println("unable to create game: " + e.getMessage());
-        }
+            //System.out.println(ex.getMessage());
+            System.out.println("Unable to create game.");        }
     }
 
     private GameData gameSelector() {
@@ -161,7 +169,7 @@ public class Client {
             System.out.print("\n Taken\n");
             colorSelector(game);
         }
-        ChessGame.TeamColor teamColor = (input == 0) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+        ChessGame.TeamColor teamColor = (input == 2) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
         return teamColor;
     }
 
@@ -180,9 +188,13 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
+
+            BoardPrinter printer = new BoardPrinter();
+            printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
+            printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
         } catch (Exception e){
-            System.out.println("unable to join game: " + e.getMessage());
-        }
+            //System.out.println(ex.getMessage());
+            System.out.println("Unable to join game");        }
     }
 
     public void logout() {
@@ -190,14 +202,28 @@ public class Client {
             server.logout(new LogoutRequest(authToken));
             authToken = null;
         } catch (Exception e){
-            System.out.println("unable to logout: " + e.getMessage());
-        }
+            //System.out.println(ex.getMessage());
+            System.out.println("Unable to logout");        }
     }
 
     public void observe() {
         listGames();
-        GameData game = gameSelector();
-        System.out.print(game.toString());
+        if (gameList.isEmpty()) {
+            System.out.println("No available games.  Create a game and come back.");
+            return;
+        }
+
+        System.out.println("Enter a number to select a game");
+        int input = getInt() - 1;
+        if (input >= gameList.size()) {
+            System.out.println("Game does not exist, select another game");
+            observe();
+        }
+        GameData game = gameList.get(input);
+        BoardPrinter printer = new BoardPrinter();
+        printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
+        printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
+        System.out.print("Joined game :)");
     }
 
 
@@ -234,7 +260,7 @@ public class Client {
                 3 List Games
                 4 Join Game
                 5 Observe Game
-                0 Quit
+                6 Help
                 """;
         }
     }

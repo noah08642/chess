@@ -26,7 +26,8 @@ public class UserService {
         String pass = request.password();
         String mail = request.email();
 
-        if ((user == null) || (pass == null) || (mail == null)) {
+        if ((user == null) || (pass == null) || (mail == null) ||
+                (user.isEmpty()) || (pass.isEmpty()) || (mail.isEmpty())) {
             throw new BadRequestException();
         }
 

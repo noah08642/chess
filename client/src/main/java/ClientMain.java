@@ -15,7 +15,6 @@ public class ClientMain {
 
     public static void run(String serverUrl) {
         Client client = new Client(serverUrl);
-        new Repl(serverUrl).run();
 
         System.out.println("\uD83D\uDC36 Welcome to the chess menu. Sign in to start.");
 
