@@ -1,13 +1,19 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameData;
 import network.ServerFacade;
 import request.*;
 import result.LogRegResult;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
+
+import static ui.BoardPrinter.letters;
 
 
 public class GameClient {
@@ -36,8 +42,8 @@ public class GameClient {
             switch (input) {
                 case 1 -> help();
                 case 2 -> redrawBoard();
-                case 3 -> makeMove();
-                case 4 -> resign();
+//                case 3 -> makeMove();
+//                case 4 -> resign();
                 case 5 -> legalMoves();
                 case 0 -> {return false;}
             };
@@ -48,187 +54,50 @@ public class GameClient {
     }
 
     private void help() {
-        System.out.println("Enter 0 to quit, enter 1 to login, enter 2 to register, or enter 3 to see this again.");
+        System.out.println("Enter 0 to quit, enter 1 to see this message again, enter 2 to redraw board, enter 3 to make move, enter 4 to resign, enter 5 to see legal moves.");
     }
 
-    private void help2() {
-        System.out.println("Enter 1 to logout, 2 to create game, 3 to list games, 4 to join a game, 5 ot observe, and 6 to see this menu again.");
-    }
-
-    public void login() {
-        try {
-            System.out.println("Enter username: ");
-            String user = getInput();
-            System.out.println("Enter password: ");
-            String pass = getInput();
-            LoginRequest request = new LoginRequest(user, pass);
-            LogRegResult result = server.login(request);
-            authToken = result.authToken();
-        }
-        catch (Exception ex) {
-            //System.out.println(ex.getMessage());
-            System.out.println("Unauthorized");
-        }
-    }
-
-    public void register() {
-        try {
-            System.out.println("Enter username: ");
-            String user = getInput();
-            System.out.println("Enter password: ");
-            String pass = getInput();
-            System.out.println("Enter email: ");
-            String email = getInput();
-            RegisterRequest request = new RegisterRequest(user, pass, email);
-            LogRegResult result = server.register(request);
-            authToken = result.authToken();
-        }
-        catch (Exception ex) {
-            //System.out.println(ex.getMessage());
-            System.out.println("Invalid");
-        }
-    }
-
-    public void listGames() {
-        try {
-            List<GameData> gameList = server.listGames(new ListRequest(authToken));
-            this.gameList = gameList;
-            if(gameList == null) {
-                System.out.println("No games available");
-            }
-            else {
-                System.out.println("\nGames: ");
-                for(int i = 0; i < gameList.size(); ++i) {
-                    GameData game = gameList.get(i);
-                    System.out.println(" " + (i + 1) + " " + game.gameName());
-
-                    String whiteName = (game.whiteUsername()==null) ? "Available" : game.whiteUsername();
-                    String blackName = (game.blackUsername()==null) ? "Available" : game.blackUsername();
-
-                    System.out.println("   - White: " + whiteName);
-                    System.out.println("   - Black: " + blackName);
-
-                }
-            }
-        } catch(Exception e) {
-            System.out.println("error in listing games (could be bad authToken)");
-        }
-    }
-
-    public void createGame() {
-        System.out.println("Enter game name: ");
-        String gameName = getInput();
-        CreateGameRequest request = new CreateGameRequest(gameName, authToken);
-        try {
-            server.createGame(request);
-        } catch(Exception e) {
-            //System.out.println(ex.getMessage());
-            System.out.println("Unable to create game.");        }
-    }
-
-    private GameData gameSelector() {
-        listGames();
-        if (gameList.isEmpty()) {
-            System.out.println("No available games.  Create a game and come back.");
-            return null;
-        }
-
-        System.out.println("Enter a number to select a game");
-        int input = getInt() - 1;
-        if (input >= gameList.size()) {
-            System.out.println("Game does not exist, select another game");
-            return gameSelector();
-        }
-        GameData game = gameList.get(input);
-        if (game.blackUsername()!= null && game.whiteUsername()!=null) {
-            System.out.print("Not available to join.  Select another game. \n");
-            return gameSelector();
-        }
-        return game;
-    }
-
-    private ChessGame.TeamColor colorSelector(GameData game) {
-        System.out.println("Enter a number to select a color");
-        System.out.print("\n1 WHITE \n2 BLACK\n");
-        int input = getInt();
-        if (input != 1 && input != 2) {
-            System.out.print("\n Invalid\n");
-            colorSelector(game);
-        }
-        String choice = (input == 2) ? game.blackUsername() : game.whiteUsername();
-        if (choice != null) {
-            System.out.print("\n Taken\n");
-            colorSelector(game);
-        }
-        ChessGame.TeamColor teamColor = (input == 2) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-        return teamColor;
-    }
-
-    public void joinGame() {
-
-        GameData game = gameSelector();
-
-        if (game==null) {
-            System.out.println("No available games.  Create one and then come back.");
-            return;
-        }
-
-        int id = game.gameID();
-
-        ChessGame.TeamColor teamColor = colorSelector(game);
-
-        try {
-            server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            GameClient gameClient = new GameClient();
-
-            BoardPrinter printer = new BoardPrinter();
-            printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
-            printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
-        } catch (Exception e){
-            //System.out.println(ex.getMessage());
-            System.out.println("Unable to join game");        }
-    }
-
-    public void logout() {
-        try {
-            server.logout(new LogoutRequest(authToken));
-            authToken = null;
-        } catch (Exception e){
-            //System.out.println(ex.getMessage());
-            System.out.println("Unable to logout");        }
-    }
-
-    public void observe() {
-        listGames();
-        if (gameList.isEmpty()) {
-            System.out.println("No available games.  Create a game and come back.");
-            return;
-        }
-
-        System.out.println("Enter a number to select a game");
-        int input = getInt() - 1;
-        if (input >= gameList.size()) {
-            System.out.println("Game does not exist, select another game");
-            observe();
-        }
-        GameData game = gameList.get(input);
+    private void redrawBoard() {
+        ChessBoard board = new ChessBoard();
         BoardPrinter printer = new BoardPrinter();
-        printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
-        printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
-        System.out.print("Joined game :)");
+        printer.print(ChessGame.TeamColor.WHITE, board.getBoard());
     }
 
+    private void legalMoves() {
+        BoardPrinter printer = new BoardPrinter();
 
+        System.out.println("Enter a piece's location to see valid moves (for example: b4");
+        String location = getInput();
+        while(location.isEmpty() || location.length()>2 || !letters.contains(String.valueOf(location.charAt(0))) ||
+            Integer.parseInt(String.valueOf(location.charAt(1))) < 1 || Integer.parseInt(String.valueOf(location.charAt(1))) > 8) {
+            System.out.println("Please enter a valid location.");
+            location = getInput();
+        }
+        String colString = String.valueOf(location.charAt(0));
+        int row = Integer.parseInt(String.valueOf(location.charAt(1)));
+        int col = letters.indexOf(colString);
 
+        ChessPosition position = new ChessPosition(row, col);
+        ChessGame game = new ChessGame();
+        Collection<ChessMove> legalMoves =  game.validMoves(position);
+        boolean[][] legalSpots = new boolean[8][8];
+        for (ChessMove move : legalMoves) {
+            int endRow = move.getEndPosition().getRow();
+            int endCol = move.getEndPosition().getColumn();
+            legalSpots[endRow - 1][endCol - 1] = true;
+        }
 
-    private String getInput() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
+        printer.print(ChessGame.TeamColor.WHITE, game.getBoard().getBoard(), legalSpots);
+        System.out.println(menu());
     }
 
     private int getInt() {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
+    }
+    private String getInput() {
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextLine();
     }
 
 

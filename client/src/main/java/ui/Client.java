@@ -188,7 +188,8 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            GameClient gameClient = new GameClient();
+            GameClient gameClient = new GameClient(server, authToken);
+            gameClient.run();
 
             BoardPrinter printer = new BoardPrinter();
             printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
