@@ -6,15 +6,14 @@ import request.*;
 import result.ListResult;
 import result.LogRegResult;
 
-import java.io.IOException;
 import java.util.List;
 
 public class ServerFacade {
-    ClientCommunicator communicator;
+    HttpCommunicator communicator;
     String url;
 
     public ServerFacade(String serverURL) {
-        this.communicator = new ClientCommunicator();
+        this.communicator = new HttpCommunicator();
         this.url = serverURL;
     }
 

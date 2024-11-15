@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static ui.BoardPrinter.letters;
+import static ui.EscapeSequences.RESET_BG_COLOR;
 
 
 public class GameClient {
@@ -88,6 +89,7 @@ public class GameClient {
         }
 
         printer.print(ChessGame.TeamColor.WHITE, game.getBoard().getBoard(), legalSpots);
+        System.out.println(RESET_BG_COLOR);
         System.out.println(menu());
     }
 
