@@ -1,26 +1,28 @@
 package network;
 
-import javax.websocket.Session;
+import javax.websocket.*;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 
-@WebSocket
-public class WebsocketCommunicator {
+public class WebsocketCommunicator extends Endpoint {
+    private Session session;
 
-    public static void main(String[] args) {
-        Spark.port(8080);
-        Spark.webSocket("/connect", WSServer.class);
-        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
+    public WebsocketCommunicator() throws Exception {
+        URI uri = new URI("ws://localhost:8080/connect");
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        this.session = container.connectToServer(this, uri);
+
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String message) {
+                System.out.println(message);
+            }
+        });
     }
 
-    @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws Exception {
-        session.getRemote().sendString("WebSocket response: " + message);
-    }
-}
-
-
+    public void send(String msg) throws Exception {this.session.getBasicRemote().sendText(msg);}
+    public void onOpen(Session session, EndpointConfig endpointConfig) {}
 
 
     // Helper method to read InputStream and return it as a String

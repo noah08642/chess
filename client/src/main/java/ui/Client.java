@@ -16,9 +16,11 @@ public class Client {
     private final String serverUrl;
     private String authToken;
     private List<GameData> gameList;
+    private String username;
 
-    public Client(String serverUrl) {
-        server = new ServerFacade(serverUrl);
+    public Client(String serverUrl) throws Exception {
+        try {server = new ServerFacade(serverUrl);
+        } catch( Exception ex) { System.out.println(ex.getMessage());}
         this.serverUrl = serverUrl;
         authToken = null;
     }
@@ -73,6 +75,7 @@ public class Client {
             LoginRequest request = new LoginRequest(user, pass);
             LogRegResult result = server.login(request);
             authToken = result.authToken();
+            username = user;
         }
         catch (Exception ex) {
             //System.out.println(ex.getMessage());
@@ -91,6 +94,7 @@ public class Client {
             RegisterRequest request = new RegisterRequest(user, pass, email);
             LogRegResult result = server.register(request);
             authToken = result.authToken();
+            username = user;
         }
         catch (Exception ex) {
             //System.out.println(ex.getMessage());
@@ -188,7 +192,7 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            GameClient gameClient = new GameClient(server, authToken);
+            GameClient gameClient = new GameClient(server, authToken, username, game);
             gameClient.run();
 
             BoardPrinter printer = new BoardPrinter();

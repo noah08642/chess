@@ -8,6 +8,7 @@ import model.GameData;
 import network.ServerFacade;
 import request.*;
 import result.LogRegResult;
+import websocket.commands.ConnectCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,13 +21,18 @@ import static ui.EscapeSequences.RESET_BG_COLOR;
 public class GameClient {
     ServerFacade server;
     private String authToken;
+    private String username;
+    private GameData game;
 
-    public GameClient(ServerFacade server, String authToken) {
+    public GameClient(ServerFacade server, String authToken, String username, GameData game) {
         this.server = server;
         this.authToken = authToken;
+        this.username = username;
+        this.game = game;
     }
 
-    void run() {
+    void run() throws Exception {
+        server.notifyConnect(new ConnectCommand(authToken, game.gameID()));
         System.out.println(menu());
         int input = getInt();
         while(input!= 0) {

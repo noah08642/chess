@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Repl {
     private final Client client;
 
-    public Repl(String serverUrl) {
+    public Repl(String serverUrl) throws Exception {
         client = new Client(serverUrl);
     }
 

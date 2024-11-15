@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class ClientMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         var serverUrl = "http://localhost:8080";
         if (args.length == 1) {
             serverUrl = args[0];
@@ -13,7 +13,7 @@ public class ClientMain {
         run(serverUrl);
     }
 
-    public static void run(String serverUrl) {
+    public static void run(String serverUrl) throws Exception {
         Client client = new Client(serverUrl);
 
         System.out.println("\uD83D\uDC36 Welcome to the chess menu. Sign in to start.");
