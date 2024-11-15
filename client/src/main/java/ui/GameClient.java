@@ -1,55 +1,46 @@
 package ui;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
-
 import chess.ChessGame;
 import model.GameData;
 import network.ServerFacade;
 import request.*;
 import result.LogRegResult;
 
+import java.util.List;
+import java.util.Scanner;
 
-public class Client {
+
+public class GameClient {
     ServerFacade server;
-    private final String serverUrl;
     private String authToken;
-    private List<GameData> gameList;
 
-    public Client(String serverUrl) {
-        server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
-        authToken = null;
+    public GameClient(ServerFacade server, String authToken) {
+        this.server = server;
+        this.authToken = authToken;
     }
 
-    // update this..
-    // if they don't have authorization, send them to menu 1 outputs
-    // if the do, send them to menu 2 outputs
-    // cases are numbers
+    void run() {
+        System.out.println(menu());
+        int input = getInt();
+        while(input!= 0) {
+            eval(input);
+            menu();
+            input = getInt();
+        }
+    }
+
+
+
     public boolean eval(int input) {
         try {
-            if (input == 0) {
-                return false;
-            }
-            if (authToken==null) {
-                switch (input) {
-                    case 1 -> login();
-                    case 2 -> register();
-                    case 3 -> help();
-                };
-            }
-            else {
-                switch (input) {
-                    case 1 -> logout();
-                    case 2 -> createGame();
-                    case 3 -> listGames();
-                    case 4 -> joinGame();
-                    case 5 -> observe();
-                    case 6 -> help2();
-                };
-            }
-
+            switch (input) {
+                case 1 -> help();
+                case 2 -> redrawBoard();
+                case 3 -> makeMove();
+                case 4 -> resign();
+                case 5 -> legalMoves();
+                case 0 -> {return false;}
+            };
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -242,29 +233,15 @@ public class Client {
 
 
     public String menu() {
-        if (authToken == null) {
             return """
                     Enter a number to select:
                     
-                    1 Login
-                    2 Register
-                    3 Help
-                    0 Quit
+                    1 Help
+                    2 Redraw Chessboard
+                    3 Make Move
+                    4 Resign
+                    5 Highlight Legal Moves
+                    0 Leave Game
                     """;
-        }
-        else {
-            return """
-                Enter a number to select:
-                
-                1 Logout
-                2 Create Game
-                3 List Games
-                4 Join Game
-                5 Observe Game
-                6 Help
-                """;
-        }
     }
-
-
 }
