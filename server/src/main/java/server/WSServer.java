@@ -8,11 +8,13 @@ import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import gson.Serializer;
 
 import java.io.IOException;
 import static gson.Serializer.deserialize;
+import static gson.Serializer.serialize;
 
 @WebSocket
 public class WSServer {
@@ -28,7 +30,8 @@ public class WSServer {
 
         String returnString = parseMessage(session, message);
 
-        session.getRemote().sendString("WebSocket response: " + returnString);
+        System.out.println("about to send notification to communicator");
+        session.getRemote().sendString(returnString);
     }
 
     private String parseMessage(Session session, String message) throws IOException {
@@ -41,7 +44,7 @@ public class WSServer {
                 case UserGameCommand.CommandType.CONNECT :
                     ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
                     // call a handler class with the connectCommand... In fact this should probably all be in a handler...
-                    return "found connect command.";
+                    return serialize(new NotificationMessage("Made it to CONNECT branch!  good job :)"));
                 case UserGameCommand.CommandType.LEAVE :
                     LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
                     return "found leave command";

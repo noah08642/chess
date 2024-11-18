@@ -23,8 +23,8 @@ public class WebsocketCommunicator extends Endpoint {
             public void onMessage(String message) { // gets triggered every time a message is received
                 receive(message);
 
-                System.out.println("4. Server sending message");
-                System.out.println(message); // later you can move this to client
+                System.out.println("Message received by Websocket Communicator");
+                System.out.println(message); // later you can move this to client... remember that I need to pass the server facade as "this"
             }
         });
     }
@@ -35,6 +35,8 @@ public class WebsocketCommunicator extends Endpoint {
         ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
 
         switch (type) {
+            case ServerMessage.ServerMessageType.ERROR:
+
             //error
             //load game
             //notifi ation
