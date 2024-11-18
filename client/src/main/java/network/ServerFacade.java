@@ -9,6 +9,9 @@ import websocket.commands.ConnectCommand;
 
 import java.util.List;
 
+import static gson.Serializer.deserialize;
+import static gson.Serializer.serialize;
+
 public class ServerFacade {
     HttpCommunicator httpCommunicator;
     WebsocketCommunicator wsCommunicator;
@@ -30,15 +33,7 @@ public class ServerFacade {
         return deserialize(jsonResult, LogRegResult.class);
     }
 
-    private String serialize(Object object) {
-        var serializer = new Gson();
-        return serializer.toJson(object);
-    }
 
-    private <T> T deserialize(String json, Class<T> clazz) {
-        var deserializer = new Gson();
-        return deserializer.fromJson(json, clazz);
-    }
 
     public List<GameData> listGames(ListRequest request) throws Exception {
         String jsonResult = httpCommunicator.doGet(url + "/game", request.authToken());

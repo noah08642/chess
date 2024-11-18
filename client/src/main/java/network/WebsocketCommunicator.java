@@ -1,10 +1,15 @@
 package network;
 
+import websocket.messages.ErrorMessage;
+import websocket.messages.ServerMessage;
+
 import javax.websocket.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+
+import static gson.Serializer.deserialize;
 
 public class WebsocketCommunicator extends Endpoint {
     private Session session;
@@ -15,10 +20,30 @@ public class WebsocketCommunicator extends Endpoint {
         this.session = container.connectToServer(this, uri);
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-            public void onMessage(String message) {
-                System.out.println(message);
+            public void onMessage(String message) { // gets triggered every time a message is received
+                receive(message);
+
+                System.out.println("4. Server sending message");
+                System.out.println(message); // later you can move this to client
             }
         });
+    }
+
+    public void receive(String message) {
+        // Deserialize the JSON message into your custom object
+        var parsedObject = deserialize(message, ServerMessage.class);
+        ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
+
+        switch (type) {
+            //error
+            //load game
+            //notifi ation
+        }
+
+        if (type == ServerMessage.ServerMessageType.ERROR) {
+            var fullyParsed = deserialize(message, ErrorMessage.class);
+            // do stuff with parsed error
+        }
     }
 
     public void send(String msg) throws Exception {this.session.getBasicRemote().sendText(msg);}

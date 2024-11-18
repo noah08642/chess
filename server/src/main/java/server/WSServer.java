@@ -1,8 +1,18 @@
 package server;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import spark.Spark;
+import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.ServerMessage;
+import gson.Serializer;
+
+import java.io.IOException;
+import static gson.Serializer.deserialize;
 
 @WebSocket
 public class WSServer {
@@ -13,30 +23,38 @@ public class WSServer {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws Exception {
+    public void onMessage(Session session, String message) throws Exception {  // when the server gets a message from client
         System.out.printf("Received: %s", message);
 
-        parseMessage(message);
+        String returnString = parseMessage(session, message);
 
-        session.getRemote().sendString("WebSocket response: " + message);
+        session.getRemote().sendString("WebSocket response: " + returnString);
     }
 
-    private String parseMessage(String message) {
+    private String parseMessage(Session session, String message) throws IOException {
         try {
             // Deserialize the JSON message into your custom object
-            var parsedObject = MyCustomObject.fromJson(message);
+            var parsedObject = deserialize(message, UserGameCommand.class);
+            UserGameCommand.CommandType type = parsedObject.getCommandType();
 
-            // Process the deserialized object as needed
-            System.out.println("Parsed object: " + parsedObject);
+            switch (type) {
+                case UserGameCommand.CommandType.CONNECT :
+                    ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
+                    // call a handler class with the connectCommand... In fact this should probably all be in a handler...
+                    return "found connect command.";
+                case UserGameCommand.CommandType.LEAVE :
+                    LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
+                    return "found leave command";
+            }
 
-            // Send a meaningful response back to the client
-            String response = "Processed your data: " + parsedObject.toString();
-            session.getRemote().sendString(response);
+            return "Not implemented yet";
 
         } catch (Exception e) {
             // Handle invalid JSON or deserialization errors
             System.err.println("Error handling message: " + e.getMessage());
-            session.getRemote().sendString("Error: Invalid message format or data.");
+            return "Error: Invalid message format or data.";
         }
     }
+
+
 }
