@@ -18,11 +18,9 @@ import static gson.Serializer.serialize;
 
 @WebSocket
 public class WSServer {
-    public static void main(String[] args) {
-        Spark.port(8080);
-        Spark.webSocket("/ws", WSServer.class);
-        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
-    }
+
+    //Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
+
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {  // when the server gets a message from client
