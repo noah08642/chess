@@ -15,7 +15,7 @@ public class WebsocketCommunicator extends Endpoint {
     private Session session;
 
     public WebsocketCommunicator() throws Exception {
-        URI uri = new URI("ws://localhost:8080/connect");
+        URI uri = new URI("ws://localhost:8080/ws");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 
