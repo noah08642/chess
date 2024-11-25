@@ -11,7 +11,7 @@ public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Connection> connections = new ConcurrentHashMap<>();
 
     public void add(int gameID, Session session) {
-        var connection = new Connection(gameID, session);
+        Connection connection = new Connection(gameID, session);
         connections.put(gameID, connection);
     }
 
@@ -19,11 +19,11 @@ public class ConnectionManager {
         connections.remove(gameID);
     }
 
-    public void broadcast(int gameID, NotificationMessage notification) throws IOException {
+    public void broadcast(int gameID, NotificationMessage notification, Session senderSession) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
-                if (c.gameID != (gameID)) {
+                if (c.session != (senderSession)) {
                     c.send(notification.toString());
                 }
             } else {

@@ -19,7 +19,9 @@ import static gson.Serializer.serialize;
 
 public class WSHandler {
 
-    public static String parseMessage(Session session, String message) throws IOException {
+    private ConnectionManager connectionManager;
+
+    public String parseMessage(Session session, String message) throws IOException {
         try {
             // Deserialize the JSON message into your custom object
             var parsedObject = deserialize(message, UserGameCommand.class);
@@ -28,11 +30,12 @@ public class WSHandler {
             switch (type) {
                 case UserGameCommand.CommandType.CONNECT :
                     ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
-                    handleConnect(connectCommand);
+                    handleConnect(connectCommand, session);
                     return serialize(new NotificationMessage("Made it to CONNECT branch!  good job :)"));
                 case UserGameCommand.CommandType.LEAVE :
                     LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
-                    return "found leave command";
+                    handleLeave(leaveCommand, session);
+                    return serialize(new NotificationMessage("made it back from leave (this is not the broadcast)"));
             }
 
             return "Not implemented yet";
@@ -44,21 +47,37 @@ public class WSHandler {
         }
     }
 
-    private static void handleConnect(ConnectCommand command, Session session) {
+    private void handleConnect(ConnectCommand command, Session session) {
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
+        if (!isValidAuth(auth)) {return;}
 
-        // Validate the auth token and gameID (you should implement this part)
-        try { SQLAuthDAO authDAO = new SQLAuthDAO();
-            if (!authDAO.authExists(auth)) {
-                System.out.println("auth doesn't exist");
-            }
-        } catch (Exception ex) {
-            System.out.println("caught exception in handle Connect");
-        }
 
-        ConnectionManager connectionManager = new ConnectionManager();
+        if (connectionManager == null) { connectionManager = new ConnectionManager(); }
+
         connectionManager.add(gameID, session);
     }
 
+    private void handleLeave(LeaveCommand command, Session session) {
+        String auth = command.getAuthToken();
+        int gameID = command.getGameID();
+        if (!isValidAuth(auth)) {return;}
+
+        NotificationMessage message = new NotificationMessage("User X is leaving the game");
+        try {connectionManager.broadcast(gameID, message, session);}
+        catch (Exception ex){System.out.println(ex.getMessage());}
+    }
+
+    private boolean isValidAuth(String auth) {
+        // Validate the auth token
+        try { SQLAuthDAO authDAO = new SQLAuthDAO();
+            if (!authDAO.authExists(auth)) {
+                System.out.println("auth doesn't exist");
+                return false;
+            }
+        } catch (Exception ex) {
+            System.out.println("error in validating auth token");
+        }
+        return true;
+    }
 }

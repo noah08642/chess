@@ -6,6 +6,7 @@ import request.*;
 import result.ListResult;
 import result.LogRegResult;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
 
 import java.util.List;
 
@@ -58,6 +59,10 @@ public class ServerFacade {
     }
 
     public void notifyConnect(ConnectCommand command) throws Exception {
+        wsCommunicator.send(serialize(command));
+    }
+
+    public void leave(LeaveCommand command) throws Exception {
         wsCommunicator.send(serialize(command));
     }
 }

@@ -9,6 +9,7 @@ import network.ServerFacade;
 import request.*;
 import result.LogRegResult;
 import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,13 +47,16 @@ public class GameClient {
 
     public boolean eval(int input) {
         try {
-            switch (input) {
+            if (input == 0) {
+                leave();
+                return false;
+            }
+            switch  (input) {
                 case 1 -> help();
                 case 2 -> redrawBoard();
 //                case 3 -> makeMove();
 //                case 4 -> resign();
                 case 5 -> legalMoves();
-                case 0 -> {return false;}
             };
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -97,6 +101,11 @@ public class GameClient {
         printer.print(ChessGame.TeamColor.WHITE, game.getBoard().getBoard(), legalSpots);
         System.out.println(RESET_BG_COLOR);
         System.out.println(menu());
+    }
+
+    private void leave() {
+        try { server.leave(new LeaveCommand(authToken, game.gameID()));}
+        catch (Exception ex) {System.out.println(ex.getMessage());}
     }
 
     private int getInt() {
