@@ -33,19 +33,6 @@ public class WebsocketCommunicator extends Endpoint {
         // Deserialize the JSON message into your custom object
         var parsedObject = deserialize(message, ServerMessage.class);
         ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
-
-        switch (type) {
-            case ServerMessage.ServerMessageType.ERROR:
-
-            //error
-            //load game
-            //notifi ation
-        }
-
-        if (type == ServerMessage.ServerMessageType.ERROR) {
-            var fullyParsed = deserialize(message, ErrorMessage.class);
-            // do stuff with parsed error
-        }
     }
 
     public void send(String msg) throws Exception {this.session.getBasicRemote().sendText(msg);}

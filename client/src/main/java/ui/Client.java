@@ -195,9 +195,6 @@ public class Client {
             GameClient gameClient = new GameClient(server, authToken, username, game);
             gameClient.run();
 
-            BoardPrinter printer = new BoardPrinter();
-            printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
-            printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
         } catch (Exception e){
             //System.out.println(ex.getMessage());
             System.out.println("Unable to join game");        }

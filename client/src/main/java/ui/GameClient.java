@@ -69,9 +69,8 @@ public class GameClient {
     }
 
     private void redrawBoard() {
-        ChessBoard board = new ChessBoard();
         BoardPrinter printer = new BoardPrinter();
-        printer.print(ChessGame.TeamColor.WHITE, board.getBoard());
+        printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
     }
 
     private void legalMoves() {
