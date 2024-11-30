@@ -27,14 +27,16 @@ public class WSHandler {
             var parsedObject = deserialize(message, UserGameCommand.class);
             UserGameCommand.CommandType type = parsedObject.getCommandType();
 
+            session.getRemote().sendString("made it to parse message");
+
             switch (type) {
                 case UserGameCommand.CommandType.CONNECT :
                     ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
                     handleConnect(connectCommand, session);
                     return serialize(new NotificationMessage("Made it to CONNECT branch!  good job :)"));
                 case UserGameCommand.CommandType.LEAVE :
-                    LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
-                    handleLeave(leaveCommand, session);
+//                    LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
+//                    handleLeave(leaveCommand, session);
                     return serialize(new NotificationMessage("made it back from leave (this is not the broadcast)"));
             }
 
@@ -59,6 +61,7 @@ public class WSHandler {
     }
 
     private void handleLeave(LeaveCommand command, Session session) {
+        System.out.println("inside of handleLeave");
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
         if (!isValidAuth(auth)) {return;}

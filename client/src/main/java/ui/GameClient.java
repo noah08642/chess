@@ -36,8 +36,9 @@ public class GameClient {
         server.notifyConnect(new ConnectCommand(authToken, game.gameID()));
         System.out.println(menu());
         int input = getInt();
-        while(input!= 0) {
-            eval(input);
+        boolean run = true;
+        while(run) {
+            run = eval(input);
             menu();
             input = getInt();
         }

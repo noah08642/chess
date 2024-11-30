@@ -11,6 +11,7 @@ public class ConnectionManager {
     public final ConcurrentHashMap<Integer, Connection> connections = new ConcurrentHashMap<>();
 
     public void add(int gameID, Session session) {
+        System.out.println("session added");
         Connection connection = new Connection(gameID, session);
         connections.put(gameID, connection);
     }
@@ -20,6 +21,7 @@ public class ConnectionManager {
     }
 
     public void broadcast(int gameID, NotificationMessage notification, Session senderSession) throws IOException {
+        senderSession.getRemote().sendString("Inside of broadcast");
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {

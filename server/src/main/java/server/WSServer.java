@@ -12,10 +12,7 @@ public class WSServer {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {  // when the server gets a message from client
 
-        if (handler == null) {
-            handler = new WSHandler();
-        }
-
+        if (handler == null) { handler = new WSHandler(); }
         System.out.printf("Received: %s", message);
 
         String returnString = handler.parseMessage(session, message);
