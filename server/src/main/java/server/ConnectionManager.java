@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static gson.Serializer.serialize;
+
 public class ConnectionManager {
-    public final ConcurrentHashMap<Integer, Connection> connections = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<Integer, Connection> connections;
 
     public void add(int gameID, Session session) {
+        if(connections == null) {connections = new ConcurrentHashMap<>();}
         System.out.println("session added");
         Connection connection = new Connection(gameID, session);
         connections.put(gameID, connection);
@@ -21,11 +24,16 @@ public class ConnectionManager {
     }
 
     public void broadcast(int gameID, NotificationMessage notification, Session senderSession) throws IOException {
-        senderSession.getRemote().sendString("Inside of broadcast");
+        if(connections == null) {connections = new ConcurrentHashMap<>();}
+        senderSession.getRemote().sendString(serialize("poop made it to broadcast" + connections.toString()));
+        senderSession.getRemote().sendString(serialize(connections.values()));
+        if(connections.isEmpty()) {
+            senderSession.getRemote().sendString(serialize("connections is empty"));
+        }
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
+        for (Connection c : connections.values()) {
             if (c.session.isOpen()) {
-                if (c.session != (senderSession)) {
+                if (c.session != (senderSession) && c.gameID == gameID) {
                     c.send(notification.toString());
                 }
             } else {
@@ -34,7 +42,7 @@ public class ConnectionManager {
         }
 
         // Clean up any connections that were left open.
-        for (var c : removeList) {
+        for (Connection c : removeList) {
             connections.remove(c.gameID);
         }
     }

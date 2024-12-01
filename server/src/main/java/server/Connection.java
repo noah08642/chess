@@ -4,6 +4,8 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 
+import static gson.Serializer.serialize;
+
 public class Connection {
     public int gameID;
     public Session session;
@@ -14,7 +16,15 @@ public class Connection {
     }
 
     public void send(String msg) throws IOException {
-        System.out.println("Inside of connection send method");
-        session.getRemote().sendString(msg);
+        session.getRemote().sendString(serialize(msg));
+    }
+
+
+    @Override
+    public String toString() {
+        return "Connection{" +
+                "gameID=" + gameID +
+                ", session=" + session.getRemote().toString() +
+                '}';
     }
 }

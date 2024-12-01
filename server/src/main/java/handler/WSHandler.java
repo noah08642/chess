@@ -27,7 +27,7 @@ public class WSHandler {
             var parsedObject = deserialize(message, UserGameCommand.class);
             UserGameCommand.CommandType type = parsedObject.getCommandType();
 
-            session.getRemote().sendString("made it to parse message");
+            session.getRemote().sendString(serialize("made it to parse message"));
 
             switch (type) {
                 case UserGameCommand.CommandType.CONNECT :
@@ -35,8 +35,8 @@ public class WSHandler {
                     handleConnect(connectCommand, session);
                     return serialize(new NotificationMessage("Made it to CONNECT branch!  good job :)"));
                 case UserGameCommand.CommandType.LEAVE :
-//                    LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
-//                    handleLeave(leaveCommand, session);
+                    LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
+                    handleLeave(leaveCommand, session);
                     return serialize(new NotificationMessage("made it back from leave (this is not the broadcast)"));
             }
 
@@ -60,8 +60,14 @@ public class WSHandler {
         connectionManager.add(gameID, session);
     }
 
-    private void handleLeave(LeaveCommand command, Session session) {
-        System.out.println("inside of handleLeave");
+    private void handleLeave(LeaveCommand command, Session session) throws IOException {
+        try {
+            session.getRemote().sendString(serialize("made it to handleLeave"));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to send string: " + e.getMessage());
+        }
+
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
         if (!isValidAuth(auth)) {return;}
@@ -70,6 +76,7 @@ public class WSHandler {
         try {connectionManager.broadcast(gameID, message, session);}
         catch (Exception ex){System.out.println(ex.getMessage());}
     }
+
 
     private boolean isValidAuth(String auth) {
         // Validate the auth token

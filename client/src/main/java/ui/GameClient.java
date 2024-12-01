@@ -35,12 +35,12 @@ public class GameClient {
     void run() throws Exception {
         server.notifyConnect(new ConnectCommand(authToken, game.gameID()));
         System.out.println(menu());
-        int input = getInt();
+        int input;
         boolean run = true;
         while(run) {
-            run = eval(input);
             menu();
             input = getInt();
+            run = eval(input);
         }
     }
 
