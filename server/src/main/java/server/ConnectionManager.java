@@ -13,8 +13,9 @@ public class ConnectionManager {
     public ConcurrentHashMap<Integer, Connection> connections;
 
     public void add(int gameID, Session session) {
+        // map from gameID to array of sessions
+        // if gameID already exists, get the set, add a session, put it back in.
         if(connections == null) {connections = new ConcurrentHashMap<>();}
-        System.out.println("session added");
         Connection connection = new Connection(gameID, session);
         connections.put(gameID, connection);
     }
@@ -27,9 +28,11 @@ public class ConnectionManager {
         if(connections == null) {connections = new ConcurrentHashMap<>();}
         senderSession.getRemote().sendString(serialize("poop made it to broadcast" + connections.toString()));
         senderSession.getRemote().sendString(serialize(connections.values()));
+
         if(connections.isEmpty()) {
             senderSession.getRemote().sendString(serialize("connections is empty"));
         }
+
         var removeList = new ArrayList<Connection>();
         for (Connection c : connections.values()) {
             if (c.session.isOpen()) {
