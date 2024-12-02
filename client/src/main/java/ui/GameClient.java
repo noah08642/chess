@@ -105,7 +105,7 @@ public class GameClient {
 
     private void leave() {
         try { server.leave(new LeaveCommand(authToken, game.gameID()));}
-        catch (Exception ex) {System.out.println(ex.getMessage());}
+        catch (Exception ex) {System.err.println(ex.getMessage());}
     }
 
     private int getInt() {

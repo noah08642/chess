@@ -10,14 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import static gson.Serializer.serialize;
 
 public class ConnectionManager {
-    public ConcurrentHashMap<Integer, Connection> connections;
+    public ConcurrentHashMap<Integer, ArrayList<Connection>> connections;
 
     public void add(int gameID, Session session) {
-        // map from gameID to array of sessions
-        // if gameID already exists, get the set, add a session, put it back in.
-        if(connections == null) {connections = new ConcurrentHashMap<>();}
+        if (connections == null) {
+            connections = new ConcurrentHashMap<>();
+        }
+
+        // Initialize the list for the gameID if it doesn't exist
+        connections.putIfAbsent(gameID, new ArrayList<>());
+
+        // Add the new connection to the list
         Connection connection = new Connection(gameID, session);
-        connections.put(gameID, connection);
+        connections.get(gameID).add(connection);
     }
 
     public void remove(int gameID) {
@@ -26,18 +31,17 @@ public class ConnectionManager {
 
     public void broadcast(int gameID, NotificationMessage notification, Session senderSession) throws IOException {
         if(connections == null) {connections = new ConcurrentHashMap<>();}
-        senderSession.getRemote().sendString(serialize("poop made it to broadcast" + connections.toString()));
-        senderSession.getRemote().sendString(serialize(connections.values()));
 
         if(connections.isEmpty()) {
             senderSession.getRemote().sendString(serialize("connections is empty"));
         }
 
         var removeList = new ArrayList<Connection>();
-        for (Connection c : connections.values()) {
+
+        for (Connection c : connections.get(gameID)) {
             if (c.session.isOpen()) {
-                if (c.session != (senderSession) && c.gameID == gameID) {
-                    c.send(notification.toString());
+                if (c.session != senderSession) {
+                    c.send(notification);
                 }
             } else {
                 removeList.add(c);
