@@ -10,7 +10,7 @@ public class ErrorMessage extends ServerMessage {
         this.errorMessage = errorMessage;
     }
 
-    String getMessage() {
+    public String getMessage() {
         return errorMessage;
     }
 }
