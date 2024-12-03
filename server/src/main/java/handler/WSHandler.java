@@ -85,16 +85,20 @@ public class WSHandler {
         catch (Exception ex){return ex.getMessage();}
 
         try {
-            if (gameDAO == null) {gameDAO = new SQLGameDAO();}
+            if (gameDAO == null) {
+                gameDAO = new SQLGameDAO();
+            }
+        } catch (DataAccessException ex) {return "not able to create gameDAO";}
+
+        try {
             GameData gameData = gameDAO.getGame(gameID);
             ChessGame.TeamColor colorToReplace;
             if (Objects.equals(gameData.whiteUsername(), getUserFromAuth(auth))) {
                 colorToReplace = ChessGame.TeamColor.WHITE;
             }
             else {colorToReplace = ChessGame.TeamColor.BLACK;}
-            gameData.addUser(colorToReplace, "");
-        }
-        catch (DataAccessException ex) {return "not able to create gameDAO";}
+            gameDAO.addPlayer(colorToReplace, gameID, null);
+        } catch (DataAccessException ex) {return ex.getMessage();}
         return "Everything went well";
     }
 

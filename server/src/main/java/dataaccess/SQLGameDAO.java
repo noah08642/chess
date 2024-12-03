@@ -67,10 +67,17 @@ public class SQLGameDAO implements GameDAO {
             throw new InvalidAuthException();
         }
 
-        if ((playerColor== ChessGame.TeamColor.BLACK && (getGame(gameID).getPlayerName(ChessGame.TeamColor.BLACK) != null)) ||
-                (playerColor== ChessGame.TeamColor.WHITE && (getGame(gameID).getPlayerName(ChessGame.TeamColor.WHITE) != null))) {
+
+        if (user!=null &&
+                ((playerColor== ChessGame.TeamColor.BLACK && (getGame(gameID).getPlayerName(ChessGame.TeamColor.BLACK) != null)) ||
+                (playerColor== ChessGame.TeamColor.WHITE && (getGame(gameID).getPlayerName(ChessGame.TeamColor.WHITE) != null)))) {
             throw new AlreadyTakenException();
         }
+
+//        if (user == null) {
+//            var statement = "UPDATE game SET whiteUsername = NULL WHERE gameID = ?";
+//            DatabaseManager.executeUpdate(statement, gameID);
+//        }
 
         if (playerColor == ChessGame.TeamColor.WHITE) {
             var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";
