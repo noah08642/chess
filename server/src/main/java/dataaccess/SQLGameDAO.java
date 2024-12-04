@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.GameData;
 
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static gson.Serializer.serialize;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
@@ -17,6 +19,13 @@ public class SQLGameDAO implements GameDAO {
 
     public SQLGameDAO() throws DataAccessException {
         DatabaseManager.createDatabase();
+    }
+
+    public void replaceGame(GameData gameData) throws DataAccessException {
+        int gameID = gameData.gameID();
+        var statement = "UPDATE game SET jsonGame = ? WHERE gameID = ?";
+        var json = new Gson().toJson(gameData.getGame());
+        DatabaseManager.executeUpdate(statement, json, gameID);
     }
 
     public void insertGame(GameData g) throws DataAccessException {
@@ -74,10 +83,6 @@ public class SQLGameDAO implements GameDAO {
             throw new AlreadyTakenException();
         }
 
-//        if (user == null) {
-//            var statement = "UPDATE game SET whiteUsername = NULL WHERE gameID = ?";
-//            DatabaseManager.executeUpdate(statement, gameID);
-//        }
 
         if (playerColor == ChessGame.TeamColor.WHITE) {
             var statement = "UPDATE game SET whiteUsername = ? WHERE gameID = ?";

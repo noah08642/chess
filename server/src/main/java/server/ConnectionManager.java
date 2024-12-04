@@ -2,6 +2,7 @@ package server;
 
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ConnectionManager {
         connections.remove(gameID);
     }
 
-    public void broadcast(int gameID, NotificationMessage notification, Session senderSession) throws IOException {
+    public void broadcast(int gameID, ServerMessage notification, Session senderSession) throws IOException {
         if(connections == null) {connections = new ConcurrentHashMap<>();}
 
         if(connections.isEmpty()) {

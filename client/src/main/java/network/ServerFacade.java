@@ -7,6 +7,7 @@ import result.ListResult;
 import result.LogRegResult;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 
 import java.util.List;
 
@@ -63,6 +64,10 @@ public class ServerFacade {
     }
 
     public void leave(LeaveCommand command) throws Exception {
+        wsCommunicator.send(serialize(command));
+    }
+
+    public void makeMove(MakeMoveCommand command) throws Exception {
         wsCommunicator.send(serialize(command));
     }
 }

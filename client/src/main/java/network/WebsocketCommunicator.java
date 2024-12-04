@@ -26,8 +26,8 @@ public class WebsocketCommunicator extends Endpoint {
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) { // gets triggered every time a message is received
 
-                System.out.println("\n Message received by Websocket Communicator:");
-                System.out.println("printing raw message" + message);
+//                System.out.println("\n Message received by Websocket Communicator:");
+//                System.out.println("printing raw message" + message);
                 System.out.println(receive(message)); //  remember that I need to pass the server facade as "this"
             }
         });
@@ -42,6 +42,7 @@ public class WebsocketCommunicator extends Endpoint {
                 var object3 = deserialize(message, LoadGameMessage.class);
                 BoardPrinter printer = new BoardPrinter();
                 printer.print(ChessGame.TeamColor.WHITE, object3.getGame().getBoard().getBoard());
+                yield "Just tried to print board";
             case ERROR:
                 var object2 = deserialize(message, ErrorMessage.class);
                 yield "ERROR:" + object2.getMessage();

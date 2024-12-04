@@ -2,6 +2,8 @@ package handler;
 
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.DataAccessException;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
@@ -10,9 +12,8 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import server.ConnectionManager;
 import service.UserService;
-import websocket.commands.ConnectCommand;
-import websocket.commands.LeaveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
@@ -41,11 +42,19 @@ public class WSHandler {
                 case UserGameCommand.CommandType.CONNECT :
                     ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
                     handleConnect(connectCommand, session);
-                    return serialize(new NotificationMessage("Made it to CONNECT branch!  good job :)"));
+                    return serialize(new NotificationMessage("Successfully joined game"));
                 case UserGameCommand.CommandType.LEAVE :
                     LeaveCommand leaveCommand = deserialize(message, LeaveCommand.class);
                     String returnString = handleLeave(leaveCommand, session);
                     return serialize(new NotificationMessage(returnString));
+                case UserGameCommand.CommandType.RESIGN :
+                    ResignCommand resignCommand = deserialize(message, ResignCommand.class);
+                    String resignResponse = handleResign(resignCommand, session);
+                    return serialize(new NotificationMessage(resignResponse));
+                case UserGameCommand.CommandType.MAKE_MOVE:
+                    MakeMoveCommand makeMoveCommand = deserialize(message, MakeMoveCommand.class);
+                    String makeMoveResponse = handleMakeMove(makeMoveCommand, session);
+                    return serialize(new NotificationMessage(makeMoveResponse));
             }
 
             return "Not implemented yet";
@@ -69,13 +78,6 @@ public class WSHandler {
     }
 
     private String handleLeave(LeaveCommand command, Session session) throws IOException {
-        try {
-            session.getRemote().sendString(serialize("made it to handleLeave"));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Failed to send string: " + e.getMessage());
-        }
-
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
         if (!isValidAuth(auth)) {return "Auth not valid";}
@@ -88,9 +90,6 @@ public class WSHandler {
             if (gameDAO == null) {
                 gameDAO = new SQLGameDAO();
             }
-        } catch (DataAccessException ex) {return "not able to create gameDAO";}
-
-        try {
             GameData gameData = gameDAO.getGame(gameID);
             ChessGame.TeamColor colorToReplace;
             if (Objects.equals(gameData.whiteUsername(), getUserFromAuth(auth))) {
@@ -100,6 +99,44 @@ public class WSHandler {
             gameDAO.addPlayer(colorToReplace, gameID, null);
         } catch (DataAccessException ex) {return ex.getMessage();}
         return "Everything went well";
+    }
+
+    private String handleResign(ResignCommand command, Session session) {
+        if (!isValidAuth(command.getAuthToken())) {
+            return "Auth not valid";
+        }
+
+        try {
+            String user = getUserFromAuth(command.getAuthToken());
+            NotificationMessage message = new NotificationMessage("User " + user + " has resigned.");
+            connectionManager.broadcast(command.getGameID(), message, session);
+        } catch(Exception ex) {return "Unable to broadcast message: " + ex.getMessage();}
+        return "handleResign went well";
+    }
+
+    private String handleMakeMove(MakeMoveCommand command, Session session) {
+        if (!isValidAuth(command.getAuthToken())) {
+            return "Auth not valid";
+        }
+
+        // check if move is valid
+        try {
+            if (!isValidMove(command.getMove(), command.getGameID())) {
+                return "Move is not valid";
+            }
+            makeMove(command.getMove(), command.getGameID());
+            GameData gameData = getGame(command.getGameID());
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
+            connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
+
+            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " + command.getMove().toString());
+            connectionManager.broadcast(command.getGameID(), notificationMessage, session);
+
+            // add in looking for check or stalemate and sending a different notification.
+
+        } catch(Exception ex) {return ex.getMessage();}
+
+        return "all is well in handleMakeMove";
     }
 
 
@@ -121,4 +158,21 @@ public class WSHandler {
         if (authDAO == null) {authDAO  = new SQLAuthDAO();}
         return authDAO.getAuth(auth).username();
     }
+
+    private boolean isValidMove(ChessMove move, int gameID) throws DataAccessException {
+        GameData game = getGame(gameID);
+        return (game.getGame().validMoves(move.getStartPosition()).contains(move)) ;
+    }
+
+    private void makeMove(ChessMove move, int gameID) throws DataAccessException, InvalidMoveException {
+        GameData game = getGame(gameID);
+        game.getGame().makeMove(move);
+        gameDAO.replaceGame(game);
+    }
+
+    private GameData getGame(int gameID) throws DataAccessException {
+        if (gameDAO ==null) {gameDAO = new SQLGameDAO();}
+        return gameDAO.getGame(gameID);
+    }
+
 }

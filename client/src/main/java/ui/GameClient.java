@@ -10,6 +10,7 @@ import request.*;
 import result.LogRegResult;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +56,7 @@ public class GameClient {
             switch  (input) {
                 case 1 -> help();
                 case 2 -> redrawBoard();
-//                case 3 -> makeMove();
+                case 3 -> makeMove();
 //                case 4 -> resign();
                 case 5 -> legalMoves();
             };
@@ -63,6 +64,32 @@ public class GameClient {
             System.out.println(ex.getMessage());
         }
         return true;
+    }
+
+    private void makeMove() {
+        ChessPosition firstPosition = getPositionFromUser("Enter a valid start position (c2, for example): \n");
+        ChessPosition secondPosition = getPositionFromUser("Enter a valid end position (c3, for example): \n");
+        if (secondPosition.getRow() == 1 || secondPosition.getRow() == 8) {
+            System.out.println("Enter a promotion piece (don't actually)");
+            // add in this logic
+        }
+        ChessMove move = new ChessMove(firstPosition, secondPosition, null);
+        MakeMoveCommand command = new MakeMoveCommand(authToken, game.gameID(), move);
+        try {server.makeMove(command);}
+        catch (Exception ex){System.out.println("Error making move: " + ex.getMessage());}
+    }
+
+    private ChessPosition getPositionFromUser(String prompt) {
+        String input = "";
+        while (input.length() != 2 || input.charAt(0) < 'a' || input.charAt(0) > 'h' || input.charAt(1) < '1' || input.charAt(1) > '8') {
+            System.out.println(prompt);
+            input = getInput();
+        }
+        char first = input.charAt(0);
+        char second = input.charAt(1);
+        int column = first - 'a' + 1;
+        int row = second - '0';
+        return new ChessPosition(row, column);
     }
 
     private void help() {

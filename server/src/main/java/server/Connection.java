@@ -2,6 +2,7 @@ package server;
 
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ public class Connection {
         this.session = session;
     }
 
-    public void send(NotificationMessage message) throws IOException {
+    public void send(ServerMessage message) throws IOException {
         session.getRemote().sendString(serialize(message));
     }
 
