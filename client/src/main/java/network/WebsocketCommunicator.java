@@ -17,38 +17,32 @@ import static gson.Serializer.deserialize;
 
 public class WebsocketCommunicator extends Endpoint {
     private Session session;
+    private ServerMessageObserver observer;
 
-    public WebsocketCommunicator() throws Exception {
+    public WebsocketCommunicator(ServerMessageObserver observer) throws Exception {
+        this.observer = observer;
         URI uri = new URI("ws://localhost:8080/ws");
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             public void onMessage(String message) { // gets triggered every time a message is received
-
-//                System.out.println("\n Message received by Websocket Communicator:");
-//                System.out.println("printing raw message" + message);
-                System.out.println(receive(message)); //  remember that I need to pass the server facade as "this"
+                observer.notify(deserialize(message, ServerMessage.class)); //  remember that I need to pass the server facade as "this"
             }
         });
     }
 
-    public String receive(String message) {
+    public ServerMessage subparse(String message) {
         // Deserialize object and return the relevant message
         var parsedObject = deserialize(message, ServerMessage.class);
         ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
         return switch (type) {
             case LOAD_GAME:
-                var object3 = deserialize(message, LoadGameMessage.class);
-                BoardPrinter printer = new BoardPrinter();
-                printer.print(ChessGame.TeamColor.WHITE, object3.getGame().getBoard().getBoard());
-                yield "Just tried to print board";
+                yield deserialize(message, LoadGameMessage.class);
             case ERROR:
-                var object2 = deserialize(message, ErrorMessage.class);
-                yield "ERROR:" + object2.getMessage();
+                yield deserialize(message, ErrorMessage.class);
             case ServerMessage.ServerMessageType.NOTIFICATION:
-                var object = deserialize(message, NotificationMessage.class);
-                yield "NOTIFICATION: " + object.getMessage();
+                yield deserialize(message, NotificationMessage.class);
         };
     }
 

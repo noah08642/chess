@@ -1,13 +1,20 @@
 package network;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
 import request.*;
 import result.ListResult;
 import result.LogRegResult;
+import ui.BoardPrinter;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.List;
 
@@ -21,8 +28,11 @@ public class ServerFacade {
 
     public ServerFacade(String serverURL) throws Exception {
         this.httpCommunicator = new HttpCommunicator();
-        this.wsCommunicator = new WebsocketCommunicator();
         this.url = serverURL;
+    }
+
+    public void passClient(ServerMessageObserver observer) throws Exception {
+        this.wsCommunicator = new WebsocketCommunicator(observer);
     }
 
     public LogRegResult login(LoginRequest request) throws Exception {
@@ -68,6 +78,10 @@ public class ServerFacade {
     }
 
     public void makeMove(MakeMoveCommand command) throws Exception {
+        wsCommunicator.send(serialize(command));
+    }
+
+    public void resign(ResignCommand command) throws Exception {
         wsCommunicator.send(serialize(command));
     }
 }

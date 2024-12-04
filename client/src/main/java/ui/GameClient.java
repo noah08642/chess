@@ -6,28 +6,37 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import model.GameData;
 import network.ServerFacade;
+import network.ServerMessageObserver;
 import request.*;
 import result.LogRegResult;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
+import websocket.commands.ResignCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
+import static gson.Serializer.deserialize;
 import static ui.BoardPrinter.letters;
 import static ui.EscapeSequences.RESET_BG_COLOR;
 
 
-public class GameClient {
+public class GameClient implements ServerMessageObserver {
     ServerFacade server;
     private String authToken;
     private String username;
     private GameData game;
 
-    public GameClient(ServerFacade server, String authToken, String username, GameData game) {
+    public GameClient(ServerFacade server, String authToken, String username, GameData game){
         this.server = server;
+        try {this.server.passClient(this);}
+        catch (Exception){}
         this.authToken = authToken;
         this.username = username;
         this.game = game;
@@ -57,13 +66,36 @@ public class GameClient {
                 case 1 -> help();
                 case 2 -> redrawBoard();
                 case 3 -> makeMove();
-//                case 4 -> resign();
+                case 4 -> resign();
                 case 5 -> legalMoves();
             };
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
         return true;
+    }
+
+    public void notify(ServerMessage message) {
+        ServerMessage.ServerMessageType type = message.getServerMessageType();
+        return switch (type) {
+            case LOAD_GAME:
+                LoadGameMessage loadGameMessage =  deserialize(message, LoadGameMessage.class);
+            case ERROR:
+                yield deserialize(message, ErrorMessage.class);
+            case ServerMessage.ServerMessageType.NOTIFICATION:
+                yield deserialize(message, NotificationMessage.class);
+        };
+        return switch (type) {
+            case LOAD_GAME:
+                BoardPrinter printer = new BoardPrinter();
+                printer.print(ChessGame.TeamColor.WHITE, message.getGame().getBoard().getBoard());
+                yield "Just tried to print board";
+            case ERROR:
+                yield "ERROR:" + message.
+            case ServerMessage.ServerMessageType.NOTIFICATION:
+                var object = deserialize(message, NotificationMessage.class);
+                yield "NOTIFICATION: " + object.getMessage();
+        }
     }
 
     private void makeMove() {
@@ -90,6 +122,14 @@ public class GameClient {
         int column = first - 'a' + 1;
         int row = second - '0';
         return new ChessPosition(row, column);
+    }
+
+    private void resign() {
+        try {
+            server.resign(new ResignCommand(authToken, game.gameID()));
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
     }
 
     private void help() {
