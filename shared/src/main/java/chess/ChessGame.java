@@ -222,6 +222,10 @@ public class ChessGame {
         return board;
     }
 
+    public boolean isEmpty(ChessPosition position) {
+        return board.getPiece(position)==null;
+    }
+
     public void setBoard(ChessBoard board) {
         this.board = board;
     }

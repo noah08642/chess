@@ -1,6 +1,7 @@
 package server;
 
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -54,4 +55,10 @@ public class ConnectionManager {
             connections.remove(c.gameID);
         }
     }
+
+
+    public void sendError(ErrorMessage errorMessage, Session senderSession) throws IOException {
+        senderSession.getRemote().sendString(serialize(errorMessage));
+    }
+
 }

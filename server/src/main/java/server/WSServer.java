@@ -14,8 +14,6 @@ public class WSServer {
 
         if (handler == null) { handler = new WSHandler(); }
 
-        String returnString = handler.parseMessage(session, message);
-
-        session.getRemote().sendString(returnString);
+        handler.handleMessage(session, message);
     }
 }

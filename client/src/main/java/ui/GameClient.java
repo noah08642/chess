@@ -85,12 +85,15 @@ public class GameClient implements ServerMessageObserver {
                 LoadGameMessage loadGameMessage = deserialize(message, LoadGameMessage.class);
                 BoardPrinter printer = new BoardPrinter();
                 printer.print(teamColor, loadGameMessage.getGame().getBoard().getBoard());
+                return;
             case ERROR:
                 ErrorMessage errorMessage = deserialize(message, ErrorMessage.class);
-                System.out.println("ERROR:" + errorMessage.getMessage());
+                System.out.println(RESET_BG_COLOR+ "ERROR:" + errorMessage.getMessage() + RESET_BG_COLOR);
+                return;
             case ServerMessage.ServerMessageType.NOTIFICATION:
                 NotificationMessage notificationMessage = deserialize(message, NotificationMessage.class);
-                System.out.println("NOTIFICATION: " + notificationMessage.getMessage());
+                System.out.println(RESET_BG_COLOR +"NOTIFICATION: " + notificationMessage.getMessage() + RESET_BG_COLOR);
+                return;
         }
     }
 
@@ -100,8 +103,8 @@ public class GameClient implements ServerMessageObserver {
             System.out.println("Not your turn!");
             return;
         }
-        ChessPosition firstPosition = getPositionFromUser("Enter a valid start position (c2, for example): \n");
-        ChessPosition secondPosition = getPositionFromUser("Enter a valid end position (c3, for example): \n");
+        ChessPosition firstPosition = getPositionFromUser("Enter a valid start position (d2, for example):");
+        ChessPosition secondPosition = getPositionFromUser("Enter a valid end position:");
         if (secondPosition.getRow() == 1 || secondPosition.getRow() == 8) {
             System.out.println("Enter a promotion piece (don't actually)");
             // add in this logic
