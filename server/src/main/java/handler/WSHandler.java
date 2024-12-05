@@ -124,11 +124,11 @@ public class WSHandler {
             if (!isValidMove(command.getMove(), command.getGameID())) {
                 return "Move is not valid";
             }
-            makeMove(command.getMove(), command.getGameID());
-            GameData gameData = getGame(command.getGameID());
 
-            // make move on the game
-            // update game in SQLDAO
+            GameData gameData = getGame(command.getGameID());
+            gameData.getGame().makeMove(command.getMove());
+            if (gameDAO == null) {gameDAO = new SQLGameDAO();}
+            gameDAO.replaceGame(gameData);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);

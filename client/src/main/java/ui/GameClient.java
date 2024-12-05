@@ -84,7 +84,7 @@ public class GameClient implements ServerMessageObserver {
             case LOAD_GAME:
                 LoadGameMessage loadGameMessage = deserialize(message, LoadGameMessage.class);
                 BoardPrinter printer = new BoardPrinter();
-                printer.print(ChessGame.TeamColor.WHITE, loadGameMessage.getGame().getBoard().getBoard());
+                printer.print(teamColor, loadGameMessage.getGame().getBoard().getBoard());
             case ERROR:
                 ErrorMessage errorMessage = deserialize(message, ErrorMessage.class);
                 System.out.println("ERROR:" + errorMessage.getMessage());
@@ -191,7 +191,13 @@ public class GameClient implements ServerMessageObserver {
     }
 
     private void updateGame() {
-        try {this.game = server.listGames(new ListRequest(authToken)).get(this.game.gameID());}
+        try {
+            for (GameData game : server.listGames(new ListRequest(authToken))) {
+                if(game.gameID() == this.game.gameID()) {
+                    this.game = game;
+                }
+            }
+        }
         catch (Exception ex) {System.out.println(ex.getMessage());}
     }
 
