@@ -126,6 +126,10 @@ public class WSHandler {
             }
             makeMove(command.getMove(), command.getGameID());
             GameData gameData = getGame(command.getGameID());
+
+            // make move on the game
+            // update game in SQLDAO
+
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
 

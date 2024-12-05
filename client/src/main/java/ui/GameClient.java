@@ -32,14 +32,16 @@ public class GameClient implements ServerMessageObserver {
     private String authToken;
     private String username;
     private GameData game;
+    private ChessGame.TeamColor teamColor;
 
-    public GameClient(ServerFacade server, String authToken, String username, GameData game){
+    public GameClient(ServerFacade server, String authToken, String username, GameData game, ChessGame.TeamColor teamColor){
         this.server = server;
         try {this.server.passClient(this);}
-        catch (Exception){}
+        catch (Exception ex){System.out.println("Error: unable to pass Client");}
         this.authToken = authToken;
         this.username = username;
         this.game = game;
+        this.teamColor = teamColor;
     }
 
     void run() throws Exception {
@@ -75,30 +77,29 @@ public class GameClient implements ServerMessageObserver {
         return true;
     }
 
-    public void notify(ServerMessage message) {
-        ServerMessage.ServerMessageType type = message.getServerMessageType();
-        return switch (type) {
+    public void notify(String message) {
+        var parsedObject = deserialize(message, ServerMessage.class);
+        ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
+        switch (type) {
             case LOAD_GAME:
-                LoadGameMessage loadGameMessage =  deserialize(message, LoadGameMessage.class);
-            case ERROR:
-                yield deserialize(message, ErrorMessage.class);
-            case ServerMessage.ServerMessageType.NOTIFICATION:
-                yield deserialize(message, NotificationMessage.class);
-        };
-        return switch (type) {
-            case LOAD_GAME:
+                LoadGameMessage loadGameMessage = deserialize(message, LoadGameMessage.class);
                 BoardPrinter printer = new BoardPrinter();
-                printer.print(ChessGame.TeamColor.WHITE, message.getGame().getBoard().getBoard());
-                yield "Just tried to print board";
+                printer.print(ChessGame.TeamColor.WHITE, loadGameMessage.getGame().getBoard().getBoard());
             case ERROR:
-                yield "ERROR:" + message.
+                ErrorMessage errorMessage = deserialize(message, ErrorMessage.class);
+                System.out.println("ERROR:" + errorMessage.getMessage());
             case ServerMessage.ServerMessageType.NOTIFICATION:
-                var object = deserialize(message, NotificationMessage.class);
-                yield "NOTIFICATION: " + object.getMessage();
+                NotificationMessage notificationMessage = deserialize(message, NotificationMessage.class);
+                System.out.println("NOTIFICATION: " + notificationMessage.getMessage());
         }
     }
 
     private void makeMove() {
+        updateGame();
+        if (game.getGame().getTeamTurn() != teamColor) {
+            System.out.println("Not your turn!");
+            return;
+        }
         ChessPosition firstPosition = getPositionFromUser("Enter a valid start position (c2, for example): \n");
         ChessPosition secondPosition = getPositionFromUser("Enter a valid end position (c3, for example): \n");
         if (secondPosition.getRow() == 1 || secondPosition.getRow() == 8) {
@@ -137,8 +138,10 @@ public class GameClient implements ServerMessageObserver {
     }
 
     private void redrawBoard() {
+        updateGame();
         BoardPrinter printer = new BoardPrinter();
-        printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
+        printer.print(teamColor, game.getGame().getBoard().getBoard());
+        System.out.println(RESET_BG_COLOR);
     }
 
     private void legalMoves() {
@@ -156,8 +159,11 @@ public class GameClient implements ServerMessageObserver {
         int col = letters.indexOf(colString);
 
         ChessPosition position = new ChessPosition(row, col);
-        ChessGame game = new ChessGame();
-        Collection<ChessMove> legalMoves =  game.validMoves(position);
+        // update game:
+        updateGame();
+
+
+        Collection<ChessMove> legalMoves =  game.getGame().validMoves(position);
         boolean[][] legalSpots = new boolean[8][8];
         for (ChessMove move : legalMoves) {
             int endRow = move.getEndPosition().getRow();
@@ -165,7 +171,7 @@ public class GameClient implements ServerMessageObserver {
             legalSpots[endRow - 1][endCol - 1] = true;
         }
 
-        printer.print(ChessGame.TeamColor.WHITE, game.getBoard().getBoard(), legalSpots);
+        printer.print(teamColor, game.getGame().getBoard().getBoard(), legalSpots);
         System.out.println(RESET_BG_COLOR);
         System.out.println(menu());
     }
@@ -182,6 +188,11 @@ public class GameClient implements ServerMessageObserver {
     private String getInput() {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
+    }
+
+    private void updateGame() {
+        try {this.game = server.listGames(new ListRequest(authToken)).get(this.game.gameID());}
+        catch (Exception ex) {System.out.println(ex.getMessage());}
     }
 
 

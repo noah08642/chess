@@ -192,7 +192,7 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            GameClient gameClient = new GameClient(server, authToken, username, game);
+            GameClient gameClient = new GameClient(server, authToken, username, game, teamColor);
             gameClient.run();
 
         } catch (Exception e){
