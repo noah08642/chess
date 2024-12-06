@@ -37,8 +37,6 @@ public class WSHandler {
             var parsedObject = deserialize(message, UserGameCommand.class);
             UserGameCommand.CommandType type = parsedObject.getCommandType();
 
-            session.getRemote().sendString(serialize("made it to parse message"));
-
             switch (type) {
                 case UserGameCommand.CommandType.CONNECT :
                     ConnectCommand connectCommand = deserialize(message, ConnectCommand.class);
@@ -63,9 +61,14 @@ public class WSHandler {
     }
 
     private void handleConnect(ConnectCommand command, Session session) throws DataAccessException, IOException {
+        if (connectionManager==null) {connectionManager = new ConnectionManager();}
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
-        if (!isValidAuth(auth)) {return;}
+        if (!isValidAuth(auth)) {
+            ErrorMessage error = new ErrorMessage("Invalid auth");
+            connectionManager.sendUser(error, session);
+            return;
+        }
         if (connectionManager == null) { connectionManager = new ConnectionManager(); }
         connectionManager.add(gameID, session);
 
@@ -76,7 +79,7 @@ public class WSHandler {
         String message;
         String user = getUserFromAuth(command.getAuthToken());
         if (blah(gameID, user)== ChessGame.TeamColor.BLACK) {message = user + " has joined the game as Black";}
-        else if (blah(gameID, user)==ChessGame.TeamColor.WHITE) {message = user + " has joined the game as Black";}
+        else if (blah(gameID, user)==ChessGame.TeamColor.WHITE) {message = user + " has joined the game as White";}
         else{message = user + " has joined as an observer";}
         NotificationMessage notificationMessage = new NotificationMessage(message);
         connectionManager.broadcast(gameID, notificationMessage, session);
@@ -109,9 +112,10 @@ public class WSHandler {
             }
 
         } catch (DataAccessException ex) {connectionManager.sendUser(new ErrorMessage("ERROR: " + ex.getMessage()), session);}
+        connectionManager.remove(command.getGameID(), session);
     }
 
-    private void handleResign(ResignCommand command, Session session) throws IOException {
+    private void handleResign(ResignCommand command, Session session) throws IOException, DataAccessException {
         if (!isValidAuth(command.getAuthToken())) {
             try {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
             catch(IOException ex) {System.err.println("Unable to send message");}
@@ -121,21 +125,61 @@ public class WSHandler {
             String user = getUserFromAuth(command.getAuthToken());
             NotificationMessage message = new NotificationMessage("User " + user + " has resigned.");
             connectionManager.broadcast(command.getGameID(), message, session);
+            connectionManager.sendUser(message, session);
         } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
+
+        GameData gameData;
+        try {gameData = getGame(command.getGameID());
+        } catch (DataAccessException ex) {
+            connectionManager.sendUser(new ErrorMessage("Unable to get game"), session);
+            return;
+        }
+        gameData.setOver();
+        gameDAO.replaceGame(gameData);
     }
 
-    private void handleMakeMove(MakeMoveCommand command, Session session) throws IOException {
-        if (!isValidAuth(command.getAuthToken())) {
-            connectionManager.sendUser(new ErrorMessage("auth is not valid"), session);        }
+    private void handleMakeMove(MakeMoveCommand command, Session session) throws IOException, DataAccessException {
+        GameData gameData;
+        try {gameData = getGame(command.getGameID());
+        } catch (DataAccessException ex) {
+            connectionManager.sendUser(new ErrorMessage("Unable to get game"), session);
+            return;
+        }
+        if (!connectionManager.isInGame(gameData.gameID(), session)) {
+            connectionManager.sendUser(new ErrorMessage("You've left the game"), session);
+            return;
+        }
 
-        // check if move is valid
+        if (gameData.isOver()) {
+            connectionManager.sendUser(new ErrorMessage("Game is over"), session);
+            return;
+        }
+
+        if (!isValidAuth(command.getAuthToken())) {
+            connectionManager.sendUser(new ErrorMessage("auth is not valid"), session);
+            return;
+        }
+
+        String username = getUserFromAuth(command.getAuthToken());
+        if(!gameData.blackUsername().equals(username) && !gameData.whiteUsername().equals(username)) {
+            connectionManager.sendUser(new ErrorMessage("You are not a player :/  probably cause you have no friends."), session);
+            return;
+        }
+        ChessGame.TeamColor teamColor = gameData.blackUsername().equals(username) ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+
+        if(gameData.getGame().getTeamTurn() != teamColor) {
+            connectionManager.sendUser(new ErrorMessage("Not your turn!"), session);
+            return;
+        }
+
+
         try {
             if (!isValidMove(command.getMove(), command.getGameID())) {
                 connectionManager.sendUser(new ErrorMessage("move is not valid"), session);
                 return;
             }
 
-            GameData gameData = getGame(command.getGameID());
+
             gameData.getGame().makeMove(command.getMove());
             if (gameDAO == null) {gameDAO = new SQLGameDAO();}
             gameDAO.replaceGame(gameData);
@@ -148,6 +192,25 @@ public class WSHandler {
             connectionManager.broadcast(command.getGameID(), notificationMessage, session);
 
             // add in looking for check or stalemate and sending a different notification.
+
+            if (gameData.getGame().isInStalemate(gameData.getGame().getTeamTurn())) {
+                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in stalemate!");
+                connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
+                gameData.setOver();
+                gameDAO.replaceGame(gameData);
+            }
+            else if (gameData.getGame().isInCheckmate(gameData.getGame().getTeamTurn())) {
+                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in Checkmate! \n Press 0 to return to menu");
+                connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
+                connectionManager.sendUser(new NotificationMessage("Congratulations!  You've won! \nPress 0 to return to menu"), session);
+                gameData.setOver();
+                gameDAO.replaceGame(gameData);
+            }
+            else if (gameData.getGame().isInCheck(gameData.getGame().getTeamTurn())) {
+                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in check!");
+                connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
+            }
+
 
         } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage(ex.getMessage()), session);}
     }

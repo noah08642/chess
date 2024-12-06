@@ -27,8 +27,33 @@ public class ConnectionManager {
         connections.get(gameID).add(connection);
     }
 
-    public void remove(int gameID) {
-        connections.remove(gameID);
+    public void remove(int gameID, Session session) {
+        ArrayList<Connection> list = connections.get(gameID);
+        if (list != null) {
+            // Remove the session from the current game
+            list.removeIf(connection -> connection.session.equals(session));
+
+            // If the game has no more players, clean up the game
+            if (list.isEmpty()) {
+                connections.remove(gameID);
+            }
+        }
+
+        // Move the session to a dummy game
+        add(-1, session); // -1 represents the "empty game"
+    }
+
+
+
+    public boolean isInGame(int gameID, Session session) {
+        for (Connection c : connections.get(gameID)) {
+            if (c.session.isOpen()) {
+                if (c.session.equals(session)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void broadcast(int gameID, ServerMessage notification, Session senderSession) throws IOException {
@@ -38,21 +63,12 @@ public class ConnectionManager {
             senderSession.getRemote().sendString(serialize("connections is empty"));
         }
 
-        var removeList = new ArrayList<Connection>();
-
         for (Connection c : connections.get(gameID)) {
             if (c.session.isOpen()) {
                 if (c.session != senderSession) {
                     c.send(notification);
                 }
-            } else {
-                removeList.add(c);
             }
-        }
-
-        // Clean up any connections that were left open.
-        for (Connection c : removeList) {
-            connections.remove(c.gameID);
         }
     }
 

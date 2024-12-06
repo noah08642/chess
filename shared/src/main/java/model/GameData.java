@@ -10,6 +10,7 @@ public final class GameData {
     private String whiteUsername;
     private String blackUsername;
     private String gameName;
+    private boolean isOver;
 
     public GameData(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
         this.gameID = gameID;
@@ -17,7 +18,10 @@ public final class GameData {
         this.blackUsername = blackUsername;
         this.gameName = gameName;
         this.game = game;
+        this.isOver = false;
     }
+    public boolean isOver() {return isOver;}
+    public void setOver() {isOver = false;}
 
     public int gameID() {
         return gameID;
