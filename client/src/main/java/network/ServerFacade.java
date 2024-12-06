@@ -23,7 +23,7 @@ import static gson.Serializer.serialize;
 
 public class ServerFacade {
     HttpCommunicator httpCommunicator;
-    WebsocketCommunicator wsCommunicator;
+    public WebsocketCommunicator wsCommunicator;
     String url;
 
     public ServerFacade(String serverURL) throws Exception {
@@ -46,7 +46,6 @@ public class ServerFacade {
     }
 
 
-
     public List<GameData> listGames(ListRequest request) throws Exception {
         String jsonResult = httpCommunicator.doGet(url + "/game", request.authToken());
         ListResult resultObj = deserialize(jsonResult, ListResult.class);
@@ -62,7 +61,7 @@ public class ServerFacade {
     }
 
     public void logout(LogoutRequest request) throws Exception {
-        httpCommunicator.doDelete(url + "/session",  request.authToken());
+        httpCommunicator.doDelete(url + "/session", request.authToken());
     }
 
     public void clear(String auth) throws Exception {

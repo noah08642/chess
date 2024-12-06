@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import model.GameData;
 import network.ServerFacade;
 import network.ServerMessageObserver;
@@ -25,6 +22,8 @@ import java.util.Scanner;
 import static gson.Serializer.deserialize;
 import static ui.BoardPrinter.letters;
 import static ui.EscapeSequences.RESET_BG_COLOR;
+import static ui.InputReader.getInput;
+import static ui.InputReader.getInteger;
 
 
 public class GameClient implements ServerMessageObserver {
@@ -44,14 +43,15 @@ public class GameClient implements ServerMessageObserver {
         this.teamColor = teamColor;
     }
 
-    void run() throws Exception {
-        server.notifyConnect(new ConnectCommand(authToken, game.gameID()));
+    void run() {
+        try {
+            server.notifyConnect(new ConnectCommand(authToken, game.gameID()));
+        } catch( Exception ex) {System.out.println("unable to connect: " + ex.getMessage());}
         System.out.println(menu());
         int input;
         boolean run = true;
         while(run) {
-            menu();
-            input = getInt();
+            input = getInteger(menu(), false);
             run = eval(input);
         }
     }
@@ -77,6 +77,15 @@ public class GameClient implements ServerMessageObserver {
         return true;
     }
 
+    public void observe() {
+        try {server.notifyConnect(new ConnectCommand(authToken, game.gameID()));}
+        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
+        int input = -1;
+        while (input != 0) {input = getInteger("Press 0 when you're ready to leave\n");}
+        try {server.leave(new LeaveCommand(authToken, game.gameID()) );}
+        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
+    }
+
     public void notify(String message) {
         var parsedObject = deserialize(message, ServerMessage.class);
         ServerMessage.ServerMessageType type = parsedObject.getServerMessageType();
@@ -99,17 +108,45 @@ public class GameClient implements ServerMessageObserver {
 
     private void makeMove() {
         updateGame();
+        if (game.whiteUsername()==null || game.blackUsername()==null) {
+            System.out.println(RESET_BG_COLOR+"Wait for another player to join.");
+            return;
+        }
         if (game.getGame().getTeamTurn() != teamColor) {
-            System.out.println("Not your turn!");
+            System.out.println(RESET_BG_COLOR+"Not your turn!");
             return;
         }
         ChessPosition firstPosition = getPositionFromUser("Enter a valid start position (d2, for example):");
         ChessPosition secondPosition = getPositionFromUser("Enter a valid end position:");
-        if (secondPosition.getRow() == 1 || secondPosition.getRow() == 8) {
-            System.out.println("Enter a promotion piece (don't actually)");
-            // add in this logic
-        }
         ChessMove move = new ChessMove(firstPosition, secondPosition, null);
+        Collection<ChessMove> legalMoves =  game.getGame().validMoves(firstPosition);
+        for(ChessMove legalMove: legalMoves) {
+            if(secondPosition.equals(legalMove.getEndPosition()) && legalMove.promotionPiece() != null) {
+                String prompt = "Select a promotion piece:\n" +
+                        "    1 Queen\n" +
+                        "    2 Rook\n" +
+                        "    3 Bishop\n" +
+                        "    4 Knight\n";
+                int input = getInteger(prompt);
+                if (input < 1 || input > 4) {
+                    System.out.println("Invalid input; exiting.");
+                    return;
+                }
+                switch (input) {
+                    case 1: move.setPromotion(ChessPiece.PieceType.QUEEN);
+                        break;
+                    case 2: move.setPromotion(ChessPiece.PieceType.ROOK);
+                        break;
+                    case 3: move.setPromotion(ChessPiece.PieceType.BISHOP);
+                        break;
+                    case 4: move.setPromotion(ChessPiece.PieceType.KNIGHT);
+                        break;
+                }
+                break;
+            }
+        }
+
+
         MakeMoveCommand command = new MakeMoveCommand(authToken, game.gameID(), move);
         try {server.makeMove(command);}
         catch (Exception ex){System.out.println("Error making move: " + ex.getMessage());}
@@ -131,6 +168,7 @@ public class GameClient implements ServerMessageObserver {
     private void resign() {
         try {
             server.resign(new ResignCommand(authToken, game.gameID()));
+            System.out.println(RESET_BG_COLOR + "Press 0 to return to main menu");
         } catch (Exception ex) {
             System.out.println("Error: " + ex.getMessage());
         }
@@ -184,14 +222,8 @@ public class GameClient implements ServerMessageObserver {
         catch (Exception ex) {System.err.println(ex.getMessage());}
     }
 
-    private int getInt() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextInt();
-    }
-    private String getInput() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
-    }
+
+
 
     private void updateGame() {
         try {

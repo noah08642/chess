@@ -3,6 +3,8 @@ import ui.Repl;
 
 import java.util.Scanner;
 
+import static ui.InputReader.getInteger;
+
 public class ClientMain {
 
     public static void main(String[] args) throws Exception {
@@ -22,9 +24,7 @@ public class ClientMain {
         int choice;
         boolean isNotQuit = true;
         while(isNotQuit) {
-            System.out.print("\n" + ">>> ");
-            System.out.print(client.menu());
-            choice = scanner.nextInt();
+            choice = getInteger("\n" + ">>> " + client.menu());
             isNotQuit = client.eval(choice);
         }
 

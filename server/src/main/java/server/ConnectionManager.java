@@ -57,8 +57,8 @@ public class ConnectionManager {
     }
 
 
-    public void sendError(ErrorMessage errorMessage, Session senderSession) throws IOException {
-        senderSession.getRemote().sendString(serialize(errorMessage));
+    public void sendUser(ServerMessage message, Session senderSession) throws IOException {
+        senderSession.getRemote().sendString(serialize(message));
     }
 
 }

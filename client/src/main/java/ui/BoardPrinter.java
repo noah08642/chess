@@ -36,8 +36,8 @@ public class BoardPrinter {
 
         out.print(ERASE_SCREEN);
         drawBoard();
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private void drawBoard() {

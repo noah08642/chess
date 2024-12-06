@@ -9,6 +9,12 @@ import model.GameData;
 import network.ServerFacade;
 import request.*;
 import result.LogRegResult;
+import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
+
+import static ui.InputReader.getInteger;
+import static ui.InputReader.getInput;
+
 
 
 public class Client {
@@ -17,6 +23,7 @@ public class Client {
     private String authToken;
     private List<GameData> gameList;
     private String username;
+    private GameClient gameClient;
 
     public Client(String serverUrl) throws Exception {
         try {server = new ServerFacade(serverUrl);
@@ -146,8 +153,7 @@ public class Client {
             return null;
         }
 
-        System.out.println("Enter a number to select a game");
-        int input = getInt() - 1;
+        int input = getInteger("Enter a number to select a game \n") - 1;
         if (input >= gameList.size()) {
             System.out.println("Game does not exist, select another game");
             return gameSelector();
@@ -161,9 +167,8 @@ public class Client {
     }
 
     private ChessGame.TeamColor colorSelector(GameData game) {
-        System.out.println("Enter a number to select a color");
-        System.out.print("\n1 WHITE \n2 BLACK\n");
-        int input = getInt();
+        String prompt = "Enter a number to select a color \n1 WHITE \n2 BLACK\n";
+        int input = getInteger(prompt);
         if (input != 1 && input != 2) {
             System.out.print("\n Invalid\n");
             colorSelector(game);
@@ -192,7 +197,7 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            GameClient gameClient = new GameClient(server, authToken, username, game, teamColor);
+            if (gameClient==null) {gameClient = new GameClient(server, authToken, username, game, teamColor);}
             gameClient.run();
 
         } catch (Exception e){
@@ -216,31 +221,24 @@ public class Client {
             return;
         }
 
-        System.out.println("Enter a number to select a game");
-        int input = getInt() - 1;
+        int input = getInteger("Enter a number to select a game\n") - 1;
         if (input >= gameList.size()) {
             System.out.println("Game does not exist, select another game");
             observe();
         }
         GameData game = gameList.get(input);
-        BoardPrinter printer = new BoardPrinter();
-        printer.print(ChessGame.TeamColor.WHITE, game.getGame().getBoard().getBoard());
-        printer.print(ChessGame.TeamColor.BLACK, game.getGame().getBoard().getBoard());
-        System.out.print("Joined game :)");
+
+        try {
+            if (gameClient == null) {
+                gameClient = new GameClient(server, authToken, username, game, null);
+            }
+            gameClient.observe();
+        } catch (Exception ex) {System.out.println(ex.getMessage());}
     }
 
 
 
 
-    private String getInput() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextLine();
-    }
-
-    private int getInt() {
-        Scanner scanner = new Scanner(System.in);
-        return scanner.nextInt();
-    }
 
 
     public String menu() {

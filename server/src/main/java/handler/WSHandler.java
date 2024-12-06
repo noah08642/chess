@@ -58,26 +58,39 @@ public class WSHandler {
                     return;
             }
         } catch (Exception e) {
-            connectionManager.sendError(new ErrorMessage( e.getMessage()), session);
+            connectionManager.sendUser(new ErrorMessage( e.getMessage()), session);
         }
     }
 
-    private void handleConnect(ConnectCommand command, Session session) {
+    private void handleConnect(ConnectCommand command, Session session) throws DataAccessException, IOException {
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
         if (!isValidAuth(auth)) {return;}
         if (connectionManager == null) { connectionManager = new ConnectionManager(); }
         connectionManager.add(gameID, session);
+
+        GameData gameData = getGame(command.getGameID());
+        LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
+        connectionManager.sendUser(loadGameMessage, session);
+
+        String message;
+        String user = getUserFromAuth(command.getAuthToken());
+        if (blah(gameID, user)== ChessGame.TeamColor.BLACK) {message = user + " has joined the game as Black";}
+        else if (blah(gameID, user)==ChessGame.TeamColor.WHITE) {message = user + " has joined the game as Black";}
+        else{message = user + " has joined as an observer";}
+        NotificationMessage notificationMessage = new NotificationMessage(message);
+        connectionManager.broadcast(gameID, notificationMessage, session);
     }
 
-    private void handleLeave(LeaveCommand command, Session session) throws IOException {
+    private void handleLeave(LeaveCommand command, Session session) throws IOException, DataAccessException {
         String auth = command.getAuthToken();
         int gameID = command.getGameID();
-        if (!isValidAuth(auth)) {connectionManager.sendError(new ErrorMessage("ERROR: auth is not valid"), session);}
+        if (!isValidAuth(auth)) {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
 
-        NotificationMessage message = new NotificationMessage("User X is leaving the game");
+        String user = getUserFromAuth(auth);
+        NotificationMessage message = new NotificationMessage(user + " is leaving the game");
         try {connectionManager.broadcast(gameID, message, session);}
-        catch (Exception ex){connectionManager.sendError(new ErrorMessage("ERROR: " + ex.getMessage()), session);}
+        catch (Exception ex){connectionManager.sendUser(new ErrorMessage("ERROR: " + ex.getMessage()), session);}
 
         try {
             if (gameDAO == null) {
@@ -87,15 +100,20 @@ public class WSHandler {
             ChessGame.TeamColor colorToReplace;
             if (Objects.equals(gameData.whiteUsername(), getUserFromAuth(auth))) {
                 colorToReplace = ChessGame.TeamColor.WHITE;
+                gameDAO.addPlayer(colorToReplace, gameID, null);
+
             }
-            else {colorToReplace = ChessGame.TeamColor.BLACK;}
-            gameDAO.addPlayer(colorToReplace, gameID, null);
-        } catch (DataAccessException ex) {connectionManager.sendError(new ErrorMessage("ERROR: " + ex.getMessage()), session);}
+            else if (Objects.equals(gameData.blackUsername(), getUserFromAuth(auth))){
+                colorToReplace = ChessGame.TeamColor.BLACK;
+                gameDAO.addPlayer(colorToReplace, gameID, null);
+            }
+
+        } catch (DataAccessException ex) {connectionManager.sendUser(new ErrorMessage("ERROR: " + ex.getMessage()), session);}
     }
 
     private void handleResign(ResignCommand command, Session session) throws IOException {
         if (!isValidAuth(command.getAuthToken())) {
-            try {connectionManager.sendError(new ErrorMessage("ERROR: auth is not valid"), session);}
+            try {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
             catch(IOException ex) {System.err.println("Unable to send message");}
         }
 
@@ -103,17 +121,18 @@ public class WSHandler {
             String user = getUserFromAuth(command.getAuthToken());
             NotificationMessage message = new NotificationMessage("User " + user + " has resigned.");
             connectionManager.broadcast(command.getGameID(), message, session);
-        } catch(Exception ex) {connectionManager.sendError(new ErrorMessage("ERROR: auth is not valid"), session);}
+        } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
     }
 
     private void handleMakeMove(MakeMoveCommand command, Session session) throws IOException {
         if (!isValidAuth(command.getAuthToken())) {
-            connectionManager.sendError(new ErrorMessage("ERROR: auth is not valid"), session);        }
+            connectionManager.sendUser(new ErrorMessage("auth is not valid"), session);        }
 
         // check if move is valid
         try {
             if (!isValidMove(command.getMove(), command.getGameID())) {
-                connectionManager.sendError(new ErrorMessage("ERROR: move is not valid"), session);
+                connectionManager.sendUser(new ErrorMessage("move is not valid"), session);
+                return;
             }
 
             GameData gameData = getGame(command.getGameID());
@@ -123,13 +142,14 @@ public class WSHandler {
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.getGame());
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
+            connectionManager.sendUser(loadGameMessage, session);
 
-            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " + command.getMove().toString());
+            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " + command.getMove().toString() + "  (enter 3 to select \"Make Move\")");
             connectionManager.broadcast(command.getGameID(), notificationMessage, session);
 
             // add in looking for check or stalemate and sending a different notification.
 
-        } catch(Exception ex) {connectionManager.sendError(new ErrorMessage(ex.getMessage()), session);}
+        } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage(ex.getMessage()), session);}
     }
 
 
@@ -150,6 +170,14 @@ public class WSHandler {
     private String getUserFromAuth(String auth) throws DataAccessException {
         if (authDAO == null) {authDAO  = new SQLAuthDAO();}
         return authDAO.getAuth(auth).username();
+    }
+
+    private ChessGame.TeamColor blah(int gameID, String user) throws DataAccessException {
+        if (gameDAO == null) {gameDAO  = new SQLGameDAO();}
+        GameData game = gameDAO.getGame(gameID);
+        if(Objects.equals(game.blackUsername(), user)) {return ChessGame.TeamColor.BLACK;}
+        else if (Objects.equals(game.whiteUsername(), user)) {return ChessGame.TeamColor.WHITE;}
+        else {return null;}
     }
 
     private boolean isValidMove(ChessMove move, int gameID) throws DataAccessException {
