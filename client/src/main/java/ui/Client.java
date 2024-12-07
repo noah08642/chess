@@ -197,7 +197,7 @@ public class Client {
 
         try {
             server.joinGame(new JoinGameRequest(teamColor, id, authToken));
-            if (gameClient==null) {gameClient = new GameClient(server, authToken, username, game, teamColor);}
+            gameClient = new GameClient(server, authToken, username, game, teamColor);
             gameClient.run();
 
         } catch (Exception e){
@@ -229,10 +229,9 @@ public class Client {
         GameData game = gameList.get(input);
 
         try {
-            if (gameClient == null) {
-                gameClient = new GameClient(server, authToken, username, game, null);
-            }
-            gameClient.observe();
+            gameClient = new GameClient(server, authToken, username, game, null);
+
+            gameClient.run();
         } catch (Exception ex) {System.out.println(ex.getMessage());}
     }
 

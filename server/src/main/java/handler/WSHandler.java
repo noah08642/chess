@@ -212,21 +212,21 @@ public class WSHandler {
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
             connectionManager.sendUser(loadGameMessage, session);
 
-            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " +
+            NotificationMessage notificationMessage = new NotificationMessage(username + "made the move: " +
                     command.getMove().toString() + "  (enter 3 to select \"Make Move\")");
             connectionManager.broadcast(command.getGameID(), notificationMessage, session);
 
             // add in looking for check or stalemate and sending a different notification.
 
             if (gameData.getGame().isInStalemate(gameData.getGame().getTeamTurn())) {
-                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() +
+                NotificationMessage inCheckMessage = new NotificationMessage(getOtherUser(gameData, username) +
                         " is in stalemate!");
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
                 gameData.setOver();
                 gameDAO.replaceGame(gameData);
             }
             else if (gameData.getGame().isInCheckmate(gameData.getGame().getTeamTurn())) {
-                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() +
+                NotificationMessage inCheckMessage = new NotificationMessage(getOtherUser(gameData, username) +
                         " is in Checkmate! \n Press 0 to return to menu");
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
                 connectionManager.sendUser(new NotificationMessage("Congratulations!  You've won! \nPress 0 to return to menu"), session);
@@ -234,12 +234,16 @@ public class WSHandler {
                 gameDAO.replaceGame(gameData);
             }
             else if (gameData.getGame().isInCheck(gameData.getGame().getTeamTurn())) {
-                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in check!");
+                NotificationMessage inCheckMessage = new NotificationMessage(getOtherUser(gameData, username) + " is in check!");
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
             }
 
 
         } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage(ex.getMessage()), session);}
+    }
+
+    private String getOtherUser(GameData gameData, String username) {
+        return (gameData.whiteUsername().equals(username)) ? gameData.whiteUsername() : gameData.blackUsername();
     }
 
 

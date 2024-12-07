@@ -74,14 +74,16 @@ public class GameClient implements ServerMessageObserver {
         return true;
     }
 
-    public void observe() {
-        try {server.notifyConnect(new ConnectCommand(authToken, game.gameID()));}
-        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
-        int input = -1;
-        while (input != 0) {input = getInteger("Press 0 when you're ready to leave\n");}
-        try {server.leave(new LeaveCommand(authToken, game.gameID()) );}
-        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
-    }
+//    public void observe() {
+//        try {server.notifyConnect(new ConnectCommand(authToken, game.gameID()));}
+//        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
+//
+//
+//        int input = -1;
+//        while (input != 0) {input = getInteger("Press 0 when you're ready to leave\n");}
+//        try {server.leave(new LeaveCommand(authToken, game.gameID()) );}
+//        catch (Exception ex) {System.out.println("Unable to connect: " + ex.getMessage());}
+//    }
 
     public void notify(String message) {
         var parsedObject = deserialize(message, ServerMessage.class);
@@ -163,6 +165,15 @@ public class GameClient implements ServerMessageObserver {
     }
 
     private void resign() {
+        int input = getInteger("Are you sure? \n1: Yes\n2: No, return to game.");
+        if (input != 1 && input!=2) {
+            System.out.println("Not valid, returning to game.");
+            return;
+        }
+        if (input==2) {
+            System.out.println("Returning to game.");
+            return;
+        }
         try {
             server.resign(new ResignCommand(authToken, game.gameID()));
             System.out.println(RESET_BG_COLOR + "Press 0 to return to main menu");
