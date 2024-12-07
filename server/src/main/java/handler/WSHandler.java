@@ -212,19 +212,22 @@ public class WSHandler {
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
             connectionManager.sendUser(loadGameMessage, session);
 
-            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " + command.getMove().toString() + "  (enter 3 to select \"Make Move\")");
+            NotificationMessage notificationMessage = new NotificationMessage("Move was made: " +
+                    command.getMove().toString() + "  (enter 3 to select \"Make Move\")");
             connectionManager.broadcast(command.getGameID(), notificationMessage, session);
 
             // add in looking for check or stalemate and sending a different notification.
 
             if (gameData.getGame().isInStalemate(gameData.getGame().getTeamTurn())) {
-                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in stalemate!");
+                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() +
+                        " is in stalemate!");
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
                 gameData.setOver();
                 gameDAO.replaceGame(gameData);
             }
             else if (gameData.getGame().isInCheckmate(gameData.getGame().getTeamTurn())) {
-                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() + " is in Checkmate! \n Press 0 to return to menu");
+                NotificationMessage inCheckMessage = new NotificationMessage(gameData.getGame().getTeamTurn().toString() +
+                        " is in Checkmate! \n Press 0 to return to menu");
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
                 connectionManager.sendUser(new NotificationMessage("Congratulations!  You've won! \nPress 0 to return to menu"), session);
                 gameData.setOver();
