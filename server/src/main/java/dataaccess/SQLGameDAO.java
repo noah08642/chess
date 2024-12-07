@@ -103,7 +103,7 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public List<GameData> listGames() throws DataAccessException {
         List<GameData> games = new ArrayList<>();
-        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame FROM game";
+        var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame, isOver FROM game";
 
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement);
