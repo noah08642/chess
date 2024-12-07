@@ -172,7 +172,8 @@ public class GameClient implements ServerMessageObserver {
     }
 
     private void help() {
-        System.out.println("Enter 0 to quit, enter 1 to see this message again, enter 2 to redraw board, enter 3 to make move, enter 4 to resign, enter 5 to see legal moves.");
+        System.out.println("Enter 0 to quit, enter 1 to see this message again, enter 2 to redraw board, enter 3 to make move, " +
+                "enter 4 to resign, enter 5 to see legal moves.");
     }
 
     private void redrawBoard() {
