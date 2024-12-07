@@ -14,8 +14,8 @@ public class BoardPrinter {
     private  ChessGame.TeamColor color;
     private  ChessPiece[][] board;
     private final PrintStream out;
-    static final List<String> letters = Arrays.asList(null, "a", "b", "c", "d", "e", "f", "g", "h", null);
-    static final List<String> black = Arrays.asList("k","r","p","b","n","q");
+    static final List<String> LETTERS = Arrays.asList(null, "a", "b", "c", "d", "e", "f", "g", "h", null);
+    static final List<String> BLACK = Arrays.asList("k","r","p","b","n","q");
     private boolean[][] legalSpots;
 
 
@@ -70,14 +70,14 @@ public class BoardPrinter {
         out.print(SET_BG_COLOR_DARK_GREEN);
 
         if (color == ChessGame.TeamColor.WHITE) {
-            for (String letter : letters) {
+            for (String letter : LETTERS) {
                 printEdgeSquareContents(letter);
             }
         }
 
         else {
-            for (int i = letters.size() - 1; i >= 0; i--) {
-                String letter = letters.get(i);
+            for (int i = LETTERS.size() - 1; i >= 0; i--) {
+                String letter = LETTERS.get(i);
                 printEdgeSquareContents(letter);
             }
         }
@@ -190,7 +190,7 @@ public class BoardPrinter {
     }
 
     private void printPieceSquare(String letter) {
-        if (black.contains(letter)) {
+        if (BLACK.contains(letter)) {
             out.print(SET_TEXT_COLOR_BLUE);
             out.print(letter.toUpperCase());
         }

@@ -21,7 +21,7 @@ public final class GameData {
         this.isOver = false;
     }
     public boolean isOver() {return isOver;}
-    public void setOver() {isOver = false;}
+    public void setOver() {isOver = true;}
 
     public int gameID() {
         return gameID;

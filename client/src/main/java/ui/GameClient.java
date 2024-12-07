@@ -5,7 +5,6 @@ import model.GameData;
 import network.ServerFacade;
 import network.ServerMessageObserver;
 import request.*;
-import result.LogRegResult;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.MakeMoveCommand;
@@ -16,11 +15,9 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Scanner;
 
 import static gson.Serializer.deserialize;
-import static ui.BoardPrinter.letters;
+import static ui.BoardPrinter.LETTERS;
 import static ui.EscapeSequences.RESET_BG_COLOR;
 import static ui.InputReader.getInput;
 import static ui.InputReader.getInteger;
@@ -190,14 +187,14 @@ public class GameClient implements ServerMessageObserver {
 
         System.out.println("Enter a piece's location to see valid moves (for example: b4");
         String location = getInput();
-        while(location.isEmpty() || location.length()>2 || !letters.contains(String.valueOf(location.charAt(0))) ||
+        while(location.isEmpty() || location.length()>2 || !LETTERS.contains(String.valueOf(location.charAt(0))) ||
             Integer.parseInt(String.valueOf(location.charAt(1))) < 1 || Integer.parseInt(String.valueOf(location.charAt(1))) > 8) {
             System.out.println("Please enter a valid location.");
             location = getInput();
         }
         String colString = String.valueOf(location.charAt(0));
         int row = Integer.parseInt(String.valueOf(location.charAt(1)));
-        int col = letters.indexOf(colString);
+        int col = LETTERS.indexOf(colString);
 
         ChessPosition position = new ChessPosition(row, col);
         // update game:

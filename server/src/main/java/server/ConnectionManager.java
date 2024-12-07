@@ -47,11 +47,11 @@ public class ConnectionManager {
 
     public boolean isInGame(int gameID, Session session) {
         for (Connection c : connections.get(gameID)) {
-            if (c.session.isOpen()) {
+            //if (c.session.isOpen()) {
                 if (c.session.equals(session)) {
                     return true;
                 }
-            }
+            //}
         }
         return false;
     }

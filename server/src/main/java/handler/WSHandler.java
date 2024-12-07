@@ -54,6 +54,7 @@ public class WSHandler {
                     MakeMoveCommand makeMoveCommand = deserialize(message, MakeMoveCommand.class);
                     handleMakeMove(makeMoveCommand, session);
                     return;
+
             }
         } catch (Exception e) {
             connectionManager.sendUser(new ErrorMessage( e.getMessage()), session);
@@ -121,6 +122,24 @@ public class WSHandler {
             catch(IOException ex) {System.err.println("Unable to send message");}
         }
 
+        GameData gameData;
+        try {gameData = getGame(command.getGameID());
+        } catch (DataAccessException ex) {
+            connectionManager.sendUser(new ErrorMessage("Unable to get game"), session);
+            return;
+        }
+
+        if (gameData.isOver()) {
+            connectionManager.sendUser(new ErrorMessage("Game is over!"), session);
+            return;
+        }
+
+        if (isObserver(command.getAuthToken(), gameData)) {
+            connectionManager.sendUser(new ErrorMessage("You are not a player :/  probably cause you have no friends."), session);
+            return;
+        }
+
+
         try {
             String user = getUserFromAuth(command.getAuthToken());
             NotificationMessage message = new NotificationMessage("User " + user + " has resigned.");
@@ -128,14 +147,13 @@ public class WSHandler {
             connectionManager.sendUser(message, session);
         } catch(Exception ex) {connectionManager.sendUser(new ErrorMessage("ERROR: auth is not valid"), session);}
 
-        GameData gameData;
-        try {gameData = getGame(command.getGameID());
-        } catch (DataAccessException ex) {
-            connectionManager.sendUser(new ErrorMessage("Unable to get game"), session);
-            return;
-        }
-        gameData.setOver();
-        gameDAO.replaceGame(gameData);
+
+        gameDAO.setGameOver(gameData);
+    }
+
+    private boolean isObserver(String authToken, GameData gameData) throws DataAccessException {
+        String username = getUserFromAuth(authToken);
+        return !gameData.blackUsername().equals(username) && !gameData.whiteUsername().equals(username);
     }
 
     private void handleMakeMove(MakeMoveCommand command, Session session) throws IOException, DataAccessException {
@@ -157,6 +175,12 @@ public class WSHandler {
 
         if (!isValidAuth(command.getAuthToken())) {
             connectionManager.sendUser(new ErrorMessage("auth is not valid"), session);
+            return;
+        }
+
+        //
+        if (isObserver(command.getAuthToken(), gameData)) {
+            connectionManager.sendUser(new ErrorMessage("You are not a player :/  probably cause you have no friends."), session);
             return;
         }
 

@@ -44,6 +44,7 @@ public class DatabaseManager {
               `blackUsername` varchar(256),
               `gameName` varchar(256) NOT NULL,
               `jsonGame` TEXT DEFAULT NULL,
+              `isOver` boolean NOT NULL,
               PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
@@ -78,7 +79,7 @@ public class DatabaseManager {
         }
     }
 
-    private static void createTables() throws DataAccessException {
+    public static void createTables() throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             for (var statement : CREATE_STATEMENTS) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
@@ -145,6 +146,9 @@ public class DatabaseManager {
                     }
                     else if (param instanceof Integer p) {
                         ps.setInt(i + 1, p);
+                    }
+                    else if (param instanceof Boolean p) {
+                        ps.setInt(i + 1, p ? 1 : 0); // Convert boolean to 1 (true) or 0 (false)
                     }
                     else if (param == null) {
                         ps.setNull(i + 1, NULL);

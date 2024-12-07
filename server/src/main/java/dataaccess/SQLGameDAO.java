@@ -28,21 +28,27 @@ public class SQLGameDAO implements GameDAO {
         DatabaseManager.executeUpdate(statement, json, gameID);
     }
 
+    public void setGameOver(GameData gameData) throws DataAccessException {
+        int gameID = gameData.gameID();
+        var statement = "UPDATE game SET isOver = ? WHERE gameID = ?";
+        DatabaseManager.executeUpdate(statement, true, gameID);
+    }
+
     public void insertGame(GameData g) throws DataAccessException {
         if (gameExists(g.gameID())) {
             throw new AlreadyTakenException();
         }
 
         // Insert the new game into the database
-        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, jsonGame) VALUES (?, ?, ?, ?, ?)";
+        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, jsonGame, isOver) VALUES (?, ?, ?, ?, ?, ?)";
         var json = new Gson().toJson(g.getGame());
-        DatabaseManager.executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), json);
+        DatabaseManager.executeUpdate(statement, g.gameID(), g.whiteUsername(), g.blackUsername(), g.gameName(), json, g.isOver());
     }
 
 
     public GameData getGame(int gameID) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame FROM game WHERE gameID = ?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, jsonGame, isOver FROM game WHERE gameID = ?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -122,9 +128,12 @@ public class SQLGameDAO implements GameDAO {
         var blackUsername = rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
         var jsonGame = rs.getString("jsonGame");
+        var isOver = rs.getBoolean("isOver");
         var serializer = new Gson();
         var gameObject = serializer.fromJson(jsonGame, ChessGame.class);
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, gameObject);
+        GameData gameData =  new GameData(gameID, whiteUsername, blackUsername, gameName, gameObject);
+        if(isOver) {gameData.setOver();}
+        return gameData;
     }
 
 
