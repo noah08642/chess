@@ -212,7 +212,7 @@ public class WSHandler {
             connectionManager.broadcast(command.getGameID(), loadGameMessage, session);
             connectionManager.sendUser(loadGameMessage, session);
 
-            NotificationMessage notificationMessage = new NotificationMessage(username + "made the move: " +
+            NotificationMessage notificationMessage = new NotificationMessage(username + " made the move: " +
                     command.getMove().toString() + "  (enter 3 to select \"Make Move\")");
             connectionManager.broadcast(command.getGameID(), notificationMessage, session);
 
@@ -235,6 +235,7 @@ public class WSHandler {
             }
             else if (gameData.getGame().isInCheck(gameData.getGame().getTeamTurn())) {
                 NotificationMessage inCheckMessage = new NotificationMessage(getOtherUser(gameData, username) + " is in check!");
+                connectionManager.sendUser(inCheckMessage, session);
                 connectionManager.broadcast(command.getGameID(), inCheckMessage, session);
             }
 
